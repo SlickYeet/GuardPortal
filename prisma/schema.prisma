@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-    id            String    @id
+    id            String      @id
     name          String
     email         String
     emailVerified Boolean
-    image         String?   @default("https://gravatar.com/avatar/HASH")
+    image         String?     @default("https://gravatar.com/avatar/HASH")
     createdAt     DateTime
     updatedAt     DateTime
     sessions      Session[]
     accounts      Account[]
+    config        PeerConfig?
 
     @@unique([email])
     @@map("user")
@@ -68,4 +69,13 @@ model Verification {
     updatedAt  DateTime?
 
     @@map("verification")
+}
+
+model PeerConfig {
+    id        String   @id @default(cuid())
+    config    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    userId    String?  @unique
+    User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
