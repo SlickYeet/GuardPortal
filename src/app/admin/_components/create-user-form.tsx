@@ -126,7 +126,11 @@ export function CreateUserForm() {
             </Button>
           </div>
 
-          <VirtualizedCombobox options={availableIps} width="200px" />
+          <VirtualizedCombobox
+            options={availableIps}
+            searchPlaceholder="Search IP addresses..."
+            width="200px"
+          />
 
           {errors.ipAddress && (
             <p className="text-sm text-red-500">{errors.ipAddress.message}</p>

@@ -166,7 +166,7 @@ const VirtualizedCommand = ({
               >
                 <Check
                   className={cn(
-                    "mr-2 h-4 w-4",
+                    "mr-2 size-4",
                     selectedOption ===
                       filteredOptions[virtualOption.index].value
                       ? "opacity-100"
@@ -214,7 +214,7 @@ export function VirtualizedCombobox({
           {selectedOption
             ? options.find((option) => option === selectedOption)
             : searchPlaceholder}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" style={{ width: width }}>
