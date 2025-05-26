@@ -1,5 +1,7 @@
 "use server"
 
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { env } from "@/env"
@@ -27,15 +29,12 @@ export async function createFirstUserAsAdmin() {
     }
   }
 
-  return {
-    success: true,
-    message: "Successfully signed up.",
-  }
+  return redirect("/vpn")
 }
 
 export async function signIn(values: z.infer<typeof SignInSchema>) {
   const session = await auth.api.getSession({
-    headers: new Headers(),
+    headers: await headers(),
   })
 
   if (session) {
@@ -46,7 +45,7 @@ export async function signIn(values: z.infer<typeof SignInSchema>) {
     }
   }
 
-  const { email, password } = values
+  const { email, password, rememberMe } = values
 
   if (!email || !password) {
     return { error: "Email and password are required." }
@@ -56,6 +55,7 @@ export async function signIn(values: z.infer<typeof SignInSchema>) {
     body: {
       email,
       password,
+      rememberMe,
     },
     asResponse: true,
   })
@@ -67,16 +67,12 @@ export async function signIn(values: z.infer<typeof SignInSchema>) {
     }
   }
 
-  return {
-    success: true,
-    message: "Successfully signed in.",
-    session,
-  }
+  return redirect("/vpn")
 }
 
 export async function signOut() {
   const session = await auth.api.getSession({
-    headers: new Headers(),
+    headers: await headers(),
   })
 
   if (!session) {
@@ -84,7 +80,7 @@ export async function signOut() {
   }
 
   const res = await auth.api.signOut({
-    headers: new Headers(),
+    headers: await headers(),
     asResponse: true,
   })
 
@@ -92,5 +88,5 @@ export async function signOut() {
     return { error: "Failed to sign out." }
   }
 
-  return { success: true, message: "Successfully signed out." }
+  return redirect("/")
 }

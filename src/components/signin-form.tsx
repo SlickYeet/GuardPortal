@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, LogIn } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -28,8 +27,6 @@ import { Input } from "@/components/ui/input"
 import { SignInSchema } from "@/schemas/auth"
 
 export function SignInForm() {
-  const router = useRouter()
-
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -44,8 +41,6 @@ export function SignInForm() {
 
     if (result.error) {
       form.setError("root", { message: result.error })
-    } else {
-      router.push("/vpn")
     }
   }
 
