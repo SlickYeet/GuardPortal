@@ -6,11 +6,38 @@ import { env } from "@/env"
 import { SignInSchema } from "@/schemas/auth"
 import { auth } from "@/server/auth"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createFirstUserAsAdmin() {
+  const name = env.ADMIN_NAME
+  const email = env.ADMIN_EMAIL
+  const password = env.ADMIN_PASSWORD
+
+  const res = await auth.api.signUpEmail({
+    body: {
+      name,
+      email,
+      password,
+    },
+    asResponse: true,
+  })
+
+  if (!res.ok) {
+    const errorJson = await res.json()
+    return {
+      error: `Sign up failed: ${errorJson.message}`,
+    }
+  }
+
+  return {
+    success: true,
+    message: "Successfully signed up.",
+  }
+}
+
 export async function signIn(values: z.infer<typeof SignInSchema>) {
   const session = await auth.api.getSession({
     headers: new Headers(),
   })
+
   if (session) {
     return {
       success: true,
@@ -29,7 +56,6 @@ export async function signIn(values: z.infer<typeof SignInSchema>) {
     body: {
       email,
       password,
-      callbackURL: `${env.NEXT_PUBLIC_URL}/vpn`,
     },
     asResponse: true,
   })
@@ -52,6 +78,7 @@ export async function signOut() {
   const session = await auth.api.getSession({
     headers: new Headers(),
   })
+
   if (!session) {
     return { error: "No active session found." }
   }

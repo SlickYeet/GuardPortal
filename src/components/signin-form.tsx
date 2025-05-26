@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, LogIn } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { signIn } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -26,6 +28,8 @@ import { Input } from "@/components/ui/input"
 import { SignInSchema } from "@/schemas/auth"
 
 export function SignInForm() {
+  const router = useRouter()
+
   const form = useForm<z.infer<typeof SignInSchema>>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -35,8 +39,14 @@ export function SignInForm() {
     },
   })
 
-  const onSubmit = (values: z.infer<typeof SignInSchema>) => {
-    console.log({ values })
+  const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
+    const result = await signIn(values)
+
+    if (result.error) {
+      form.setError("root", { message: result.error })
+    } else {
+      router.push("/vpn")
+    }
   }
 
   const pending = form.formState.isSubmitting
@@ -51,10 +61,7 @@ export function SignInForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={() => form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="email"
@@ -63,7 +70,6 @@ export function SignInForm() {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={pending}
                       type="email"
                       placeholder="name@famlam.ca"
                       {...field}
@@ -81,7 +87,6 @@ export function SignInForm() {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
-                      disabled={pending}
                       type="password"
                       placeholder="Enter your password"
                       {...field}
@@ -99,7 +104,6 @@ export function SignInForm() {
                   <FormItem className="flex flex-row items-center">
                     <FormControl>
                       <Checkbox
-                        disabled={pending}
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
@@ -117,6 +121,12 @@ export function SignInForm() {
                 Forgot password?
               </Link> */}
             </div>
+
+            {form.formState.errors.root && (
+              <div className="text-destructive text-sm">
+                {form.formState.errors.root.message}
+              </div>
+            )}
 
             <Button
               disabled={pending}

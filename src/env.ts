@@ -12,6 +12,11 @@ export const env = createEnv({
       .default("development"),
     DATABASE_URL: z.string().url(),
     BETTER_AUTH_SECRET: z.string(),
+    ADMIN_NAME: z.string(),
+    ADMIN_EMAIL: z.string().email(),
+    ADMIN_PASSWORD: z
+      .string()
+      .min(8, "Password must be at least 8 characters long"),
   },
 
   /**
@@ -33,6 +38,9 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+    ADMIN_NAME: process.env.ADMIN_NAME,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
