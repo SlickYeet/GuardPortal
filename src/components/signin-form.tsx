@@ -23,16 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-export const SignInSchema = z.object({
-  email: z.string().email({
-    message: "Invalid email address",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters long",
-  }),
-  rememberMe: z.boolean().optional(),
-})
+import { SignInSchema } from "@/schemas/auth"
 
 export function SignInForm() {
   const form = useForm<z.infer<typeof SignInSchema>>({
@@ -73,6 +64,7 @@ export function SignInForm() {
                   <FormControl>
                     <Input
                       disabled={pending}
+                      type="email"
                       placeholder="name@famlam.ca"
                       {...field}
                     />
@@ -83,13 +75,14 @@ export function SignInForm() {
             />
             <FormField
               control={form.control}
-              name="email"
+              name="password"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       disabled={pending}
+                      type="password"
                       placeholder="Enter your password"
                       {...field}
                     />
@@ -125,7 +118,12 @@ export function SignInForm() {
               </Link> */}
             </div>
 
-            <Button type="submit" disabled={pending} className="w-full">
+            <Button
+              disabled={pending}
+              type="submit"
+              size="lg"
+              className="w-full"
+            >
               {pending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />

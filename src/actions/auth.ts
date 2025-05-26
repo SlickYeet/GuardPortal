@@ -1,10 +1,13 @@
 "use server"
 
+import { z } from "zod"
+
 import { env } from "@/env"
+import { SignInSchema } from "@/schemas/auth"
 import { auth } from "@/server/auth"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function signIn(values: any) {
+export async function signIn(values: z.infer<typeof SignInSchema>) {
   const session = await auth.api.getSession({
     headers: new Headers(),
   })
