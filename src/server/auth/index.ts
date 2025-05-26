@@ -11,11 +11,10 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "sqlite",
   }),
-  socialProviders: {
-    discord: {
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
-    },
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: env.NODE_ENV === "development",
+    disableSignUp: true,
   },
   plugins: [nextCookies()], // make sure nextCookies() is the last plugin in the array
 })

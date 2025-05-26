@@ -10,30 +10,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id   String @id @default(cuid())
-    name String
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([name])
-}
-
 model User {
     id            String    @id
     name          String
     email         String
     emailVerified Boolean
-    image         String?
+    image         String?   @default("https://gravatar.com/avatar/HASH")
     createdAt     DateTime
     updatedAt     DateTime
     sessions      Session[]
     accounts      Account[]
-    Post          Post[]
 
     @@unique([email])
     @@map("user")
