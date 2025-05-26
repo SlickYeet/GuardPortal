@@ -44,6 +44,9 @@ export function DetailsCardButtons({ config }: { config: string }) {
         description: "Please try again.",
       })
     }
+    setTimeout(() => {
+      setState((prev) => ({ ...prev, downloading: false }))
+    }, 3000)
   }
 
   const copyConfig = () => {

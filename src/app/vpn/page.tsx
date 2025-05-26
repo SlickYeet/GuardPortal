@@ -1,5 +1,6 @@
 import {
   CloudCog,
+  FileText,
   Globe,
   QrCode,
   Server,
@@ -7,6 +8,7 @@ import {
   Settings2,
 } from "lucide-react"
 
+import { getPeerConfig } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
 import { SignOutForm } from "@/app/vpn/_components/sign-out-form"
 import { QRCodeDisplay } from "@/components/qr-code-display"
@@ -18,16 +20,18 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { getStaticPeerConfig } from "@/lib/wireguard"
-
-const CONFIG_DETAILS = [
-  { label: "Server", value: "vpn.famlam.ca:51820", icon: Server },
-  { label: "Allowed IPs", value: "10.0.0.0/32", icon: Globe },
-  { label: "DNS", value: "192.168.0.200", icon: CloudCog },
-]
+import { parseWireguardConfig } from "@/lib/utils"
 
 export default async function VPNPage() {
-  const wireguardConfig = await getStaticPeerConfig()
+  const wireguardConfig = await getPeerConfig()
+  const details = parseWireguardConfig(wireguardConfig.config)
+
+  const CONFIG_DETAILS = [
+    { label: "Name", value: wireguardConfig.fileName, icon: FileText },
+    { label: "Server", value: details.server, icon: Server },
+    { label: "Allowed IPs", value: details.allowedIPs, icon: Globe },
+    { label: "DNS", value: details.dns, icon: CloudCog },
+  ]
 
   return (
     <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
@@ -57,7 +61,7 @@ export default async function VPNPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <QRCodeDisplay value={wireguardConfig} />
+              <QRCodeDisplay value={wireguardConfig.config} />
             </CardContent>
           </Card>
 
@@ -81,7 +85,7 @@ export default async function VPNPage() {
                   <p className="text-sm">{value}</p>
                 </div>
               ))}
-              <DetailsCardButtons config={wireguardConfig} />
+              <DetailsCardButtons config={wireguardConfig.config} />
             </CardContent>
           </Card>
         </div>
