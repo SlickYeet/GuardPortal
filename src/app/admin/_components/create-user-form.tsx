@@ -1,10 +1,9 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, RefreshCw } from "lucide-react"
+import { Copy, Loader2, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { FixedSizeList as List } from "react-window"
 import { toast } from "sonner"
 import { z } from "zod"
 
@@ -13,13 +12,8 @@ import { getAvailablePeerIPs } from "@/actions/wireguard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { VirtualizedCombobox } from "@/components/virtualized-combobox"
+import { cn } from "@/lib/utils"
 import { userSchema } from "@/schemas/user"
 
 export function CreateUserForm() {
@@ -33,8 +27,6 @@ export function CreateUserForm() {
     handleSubmit,
     reset,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -122,69 +114,20 @@ export function CreateUserForm() {
             <Label htmlFor="ipAddress">IP Address</Label>
             <Button
               type="button"
-              variant="ghost"
-              size="sm"
-              onClick={loadAvailableIps}
               disabled={isLoadingIps}
+              onClick={loadAvailableIps}
+              size="sm"
+              variant="outline"
             >
-              {isLoadingIps ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              <span className="ml-2">Refresh</span>
+              <RefreshCw
+                className={cn("size-4", isLoadingIps ? "animate-spin" : "")}
+              />
+              <span>Refresh</span>
             </Button>
           </div>
 
-          <Select
-            disabled={isLoadingIps}
-            value={watch("ipAddress")}
-            onValueChange={(value) => setValue("ipAddress", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select an IP address" />
-            </SelectTrigger>
-            <SelectContent>
-              {isLoadingIps ? (
-                <SelectItem value="loading" disabled>
-                  Loading available IPs...
-                </SelectItem>
-              ) : availableIps.length === 0 ? (
-                <SelectItem value="none" disabled>
-                  No available IP addresses
-                </SelectItem>
-              ) : (
-                <>
-                  <div style={{ display: "none" }}>
-                    {watch("ipAddress") && (
-                      <div style={{ display: "none" }}>
-                        <SelectItem value={watch("ipAddress")}>
-                          {watch("ipAddress")}
-                        </SelectItem>
-                      </div>
-                    )}
-                  </div>
-                  <List
-                    height={200}
-                    itemCount={availableIps.length}
-                    itemSize={36}
-                    width="100%"
-                  >
-                    {({ index, style }) => (
-                      <div style={style}>
-                        <SelectItem
-                          key={availableIps[index]}
-                          value={availableIps[index]}
-                        >
-                          {availableIps[index]}
-                        </SelectItem>
-                      </div>
-                    )}
-                  </List>
-                </>
-              )}
-            </SelectContent>
-          </Select>
+          <VirtualizedCombobox options={availableIps} width="200px" />
+
           {errors.ipAddress && (
             <p className="text-sm text-red-500">{errors.ipAddress.message}</p>
           )}
@@ -193,7 +136,7 @@ export function CreateUserForm() {
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
               Creating User...
             </>
           ) : (
@@ -210,16 +153,17 @@ export function CreateUserForm() {
           <p className="mt-1 text-sm text-yellow-700">
             Make sure to copy this password now. It won&&apos;t be shown again.
           </p>
-          <div className="mt-2 flex items-center justify-between rounded border bg-white p-2">
+          <div className="mt-2 flex items-center justify-between rounded-md border p-2">
             <code className="font-mono text-sm">{tempPassword}</code>
             <Button
-              size="sm"
-              variant="ghost"
               onClick={() => {
                 navigator.clipboard.writeText(tempPassword)
                 toast.success("Password copied to clipboard")
               }}
+              size="sm"
+              variant="outline"
             >
+              <Copy className="size-4" />
               Copy
             </Button>
           </div>

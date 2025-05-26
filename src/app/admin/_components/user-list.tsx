@@ -1,6 +1,6 @@
 "use client"
 
-import { Key, Loader2, Trash2 } from "lucide-react"
+import { Copy, Key, Loader2, RefreshCcw, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 import { UserWithConfig } from "@/types"
 
 export function UsersList() {
@@ -107,8 +108,11 @@ export function UsersList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">VPN Users</h2>
-        <Button variant="outline" onClick={loadUsers} disabled={isLoading}>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
+        <Button disabled={isLoading} onClick={loadUsers} variant="outline">
+          <RefreshCcw
+            className={cn("size-4", isLoading ? "animate-spin" : "")}
+          />
+          <span>Refresh</span>
         </Button>
       </div>
 
@@ -144,23 +148,23 @@ export function UsersList() {
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleResetPassword(user.id)}
                         disabled={isResetting === user.id}
+                        onClick={() => handleResetPassword(user.id)}
+                        size="sm"
+                        variant="outline"
                       >
                         {isResetting === user.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="size-4 animate-spin" />
                         ) : (
-                          <Key className="h-4 w-4" />
+                          <Key className="size-4" />
                         )}
                       </Button>
                       <Button
-                        variant="outline"
-                        size="sm"
                         onClick={() => setUserToDelete(user.id)}
+                        size="sm"
+                        variant="destructive"
                       >
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="size-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -192,7 +196,7 @@ export function UsersList() {
             >
               {isDeleting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Deleting...
                 </>
               ) : (
@@ -216,7 +220,7 @@ export function UsersList() {
                 it now as it won&apos;t be shown again.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <div className="flex items-center justify-between rounded border bg-gray-50 p-2">
+            <div className="flex items-center justify-between rounded-md border p-2">
               <code className="font-mono text-sm">{newPassword}</code>
               <Button
                 size="sm"
@@ -229,6 +233,7 @@ export function UsersList() {
                   })
                 }}
               >
+                <Copy className="size-4" />
                 Copy
               </Button>
             </div>
