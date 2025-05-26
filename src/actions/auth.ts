@@ -4,9 +4,19 @@ import { env } from "@/env"
 import { auth } from "@/server/auth"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function signIn(_prevState: any, formdata: FormData) {
-  const email = formdata.get("email") as string
-  const password = formdata.get("password") as string
+export async function signIn(values: any) {
+  const session = await auth.api.getSession({
+    headers: new Headers(),
+  })
+  if (session) {
+    return {
+      success: true,
+      message: "Already signed in.",
+      session,
+    }
+  }
+
+  const { email, password } = values
 
   if (!email || !password) {
     return { error: "Email and password are required." }
@@ -25,17 +35,6 @@ export async function signIn(_prevState: any, formdata: FormData) {
     const errorJson = await res.json()
     return {
       error: `Sign in failed: ${errorJson.message}`,
-    }
-  }
-
-  const session = await auth.api.getSession({
-    headers: new Headers(),
-    asResponse: true,
-  })
-
-  if (!session.ok) {
-    return {
-      error: "Failed to retrieve session after sign in.",
     }
   }
 

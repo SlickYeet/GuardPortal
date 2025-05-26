@@ -1,9 +1,10 @@
 "use client"
 
-import { AlertCircle } from "lucide-react"
-import { useActionState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, LogIn } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-import { signIn } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,11 +13,42 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
+export const SignInSchema = z.object({
+  email: z.string().email({
+    message: "Invalid email address",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters long",
+  }),
+  rememberMe: z.boolean().optional(),
+})
 
 export function SignInForm() {
-  const [state, action, pending] = useActionState(signIn, { error: "" })
+  const form = useForm<z.infer<typeof SignInSchema>>({
+    resolver: zodResolver(SignInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  })
+
+  const onSubmit = (values: z.infer<typeof SignInSchema>) => {
+    console.log({ values })
+  }
+
+  const pending = form.formState.isSubmitting
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -27,37 +59,87 @@ export function SignInForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={action} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
+        <Form {...form}>
+          <form
+            onSubmit={() => form.handleSubmit(onSubmit)}
+            className="space-y-6"
+          >
+            <FormField
+              control={form.control}
               name="email"
-              type="email"
-              placeholder="user@example.com"
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={pending}
+                      placeholder="name@famlam.ca"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              required
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={pending}
+                      placeholder="Enter your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          {state?.error && (
-            <div className="flex items-center space-x-2 text-sm text-red-600">
-              <AlertCircle className="h-4 w-4" />
-              <span>{state.error}</span>
+            <div className="flex items-center justify-between">
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center">
+                    <FormControl>
+                      <Checkbox
+                        disabled={pending}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Remember Me</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              {/* TODO */}
+              {/* <Link
+                href="/forgot-password"
+                className="text-muted-foreground text-sm underline-offset-2 hover:underline"
+              >
+                Forgot password?
+              </Link> */}
             </div>
-          )}
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
+
+            <Button type="submit" disabled={pending} className="w-full">
+              {pending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="size-4" />
+                  <span>Sign In</span>
+                </>
+              )}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   )
