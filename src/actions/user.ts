@@ -1,0 +1,165 @@
+"use server"
+
+import { hash } from "bcryptjs"
+
+import { addPeerConfig } from "@/actions/wireguard"
+import { generateTemporaryPassword } from "@/lib/password"
+import { userSchema } from "@/schemas/user"
+import { auth } from "@/server/auth"
+import { db } from "@/server/db"
+
+export async function createNewUser(data: { name: string; email: string }) {
+  try {
+    const validatedData = userSchema.parse(data)
+
+    const existingUsers = await db.user.findMany({
+      where: { email: validatedData.email },
+    })
+
+    if (existingUsers) {
+      return {
+        success: false,
+        message: "User with this email already exists.",
+      }
+    }
+
+    const tempPassword = generateTemporaryPassword()
+    const hashedPassword = await hash(tempPassword, 12)
+
+    const wireguardConfig = await addPeerConfig(
+      validatedData.ipAddress,
+      validatedData.name,
+    )
+
+    const newUser = await auth.api.signUpEmail({
+      body: {
+        name: validatedData.name,
+        email: validatedData.email,
+        password: hashedPassword,
+      },
+    })
+
+    if (!newUser) {
+      return {
+        success: false,
+        message: "Failed to create user.",
+      }
+    }
+
+    const result = await db.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { email: validatedData.email },
+      })
+
+      if (!user) {
+        throw new Error("User not found after creation.")
+      }
+
+      // Create peer config
+      await tx.peerConfig.create({
+        data: {
+          name: `${validatedData.name}'s Config`,
+          config: wireguardConfig,
+          userId: user.id,
+        },
+      })
+
+      return user
+    })
+
+    return {
+      success: true,
+      userId: result.id,
+      tempPassword,
+    }
+  } catch (error) {
+    console.error("Error creating new user:", error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred.",
+    }
+  }
+}
+
+export async function getUsers() {
+  try {
+    const users = await db.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        config: {
+          select: {
+            id: true,
+            config: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    })
+
+    return users
+  } catch (error) {
+    console.error("Error fetching users:", error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred.",
+    }
+  }
+}
+
+export async function deleteUser(userId: string) {
+  try {
+    await db.user.delete({
+      where: { id: userId },
+    })
+
+    // TODO: Delete associated peer config
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred.",
+    }
+  }
+}
+
+export async function resetUserPassword(userId: string) {
+  try {
+    const tempPassword = generateTemporaryPassword()
+    const hashedPassword = await hash(tempPassword, 12)
+
+    const accounts = await db.account.findMany({
+      where: { userId },
+      select: { id: true },
+    })
+
+    for (const account of accounts) {
+      await db.account.update({
+        where: { id: account.id, providerId: "credential" },
+        data: { password: hashedPassword },
+      })
+    }
+
+    return {
+      success: true,
+      tempPassword,
+    }
+  } catch (error) {
+    console.error("Error resetting user password:", error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred.",
+    }
+  }
+}

@@ -3,8 +3,6 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 
-import { env } from "@/env"
-
 const prisma = new PrismaClient()
 
 export const auth = betterAuth({
@@ -13,7 +11,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    autoSignIn: env.NODE_ENV === "development",
+    autoSignIn: true,
   },
   plugins: [nextCookies()], // make sure nextCookies() is the last plugin in the array
 })

@@ -5,7 +5,7 @@ import { Loader2, LogIn } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { signIn } from "@/actions/auth"
+import { createFirstUserAsAdmin } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -24,20 +23,15 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { SignInSchema } from "@/schemas/auth"
+import { SignUpSchema } from "@/schemas/auth"
 
-export function SignInForm() {
-  const form = useForm<z.infer<typeof SignInSchema>>({
-    resolver: zodResolver(SignInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      rememberMe: false,
-    },
+export function CreateFirstUser() {
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
   })
 
-  const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
-    const result = await signIn(values)
+  const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
+    const result = await createFirstUserAsAdmin(values)
 
     if (result.error) {
       form.setError("root", { message: result.error })
@@ -47,16 +41,32 @@ export function SignInForm() {
   const pending = form.formState.isSubmitting
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Sign In</CardTitle>
+        <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          Enter your credentials to access your VPN configuration
+          All fields are optional.
+          <br />
+          If you leave the fields empty, the credentials from your .env file
+          will be used.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Your Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -91,31 +101,23 @@ export function SignInForm() {
                 </FormItem>
               )}
             />
-            <div className="flex items-center justify-between">
-              <FormField
-                control={form.control}
-                name="rememberMe"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormLabel>Remember Me</FormLabel>
-                  </FormItem>
-                )}
-              />
-
-              {/* TODO */}
-              {/* <Link
-                href="/forgot-password"
-                className="text-muted-foreground text-sm underline-offset-2 hover:underline"
-              >
-                Forgot password?
-              </Link> */}
-            </div>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password Confirmation</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirm your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {form.formState.errors.root && (
               <div className="text-destructive text-sm">
@@ -132,12 +134,12 @@ export function SignInForm() {
               {pending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  <span>Signing in...</span>
+                  <span>Signing Up...</span>
                 </>
               ) : (
                 <>
                   <LogIn className="size-4" />
-                  <span>Sign In</span>
+                  <span>Sign Up</span>
                 </>
               )}
             </Button>

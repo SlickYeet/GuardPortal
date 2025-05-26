@@ -20,7 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { parseWireguardConfig } from "@/lib/utils"
+import { parseWireguardConfig } from "@/lib/wireguard"
 
 export default async function VPNPage() {
   const wireguardConfig = await getPeerConfig()

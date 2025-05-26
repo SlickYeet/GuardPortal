@@ -5,13 +5,15 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { env } from "@/env"
-import { SignInSchema } from "@/schemas/auth"
+import { SignInSchema, SignUpSchema } from "@/schemas/auth"
 import { auth } from "@/server/auth"
 
-export async function createFirstUserAsAdmin() {
-  const name = env.ADMIN_NAME
-  const email = env.ADMIN_EMAIL
-  const password = env.ADMIN_PASSWORD
+export async function createFirstUserAsAdmin(
+  values: z.infer<typeof SignUpSchema>,
+) {
+  const name = values.name || env.ADMIN_NAME
+  const email = values.email || env.ADMIN_EMAIL
+  const password = values.password || env.ADMIN_PASSWORD
 
   const res = await auth.api.signUpEmail({
     body: {
