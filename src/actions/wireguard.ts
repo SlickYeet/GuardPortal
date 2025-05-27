@@ -59,10 +59,7 @@ export async function getAvailablePeerIPs() {
   return json.data
 }
 
-export async function addPeerConfig(
-  ipAddress: string | string[],
-  name: string,
-) {
+export async function addPeerConfig(name: string, ipAddress?: string) {
   const requestOptions: RequestInit = {
     method: "POST",
     headers: {
@@ -70,8 +67,8 @@ export async function addPeerConfig(
       "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
     },
     body: JSON.stringify({
-      name,
-      allowed_ips: [...ipAddress],
+      name: `${name}'s Config`,
+      allowed_ips: [ipAddress],
     }),
   }
 

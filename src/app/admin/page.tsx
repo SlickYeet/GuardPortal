@@ -44,7 +44,9 @@ export default async function AdminPage() {
               <CardTitle>Create New VPN User</CardTitle>
               <CardDescription>
                 Create a new user with a temporary password and assign an IP
-                address
+                address.
+                <br />
+                An email will be sent to the user with their credentials.
               </CardDescription>
             </CardHeader>
             <CardContent>

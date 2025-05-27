@@ -23,7 +23,7 @@ type Option = {
   label: string
 }
 
-interface VirtualizedCommandProps {
+interface VirtualizedCommandProps extends React.ComponentProps<"select"> {
   height: string
   options: Option[]
   placeholder: string
@@ -166,7 +166,7 @@ const VirtualizedCommand = ({
               >
                 <Check
                   className={cn(
-                    "mr-2 size-4",
+                    "mr-2 h-4 w-4",
                     selectedOption ===
                       filteredOptions[virtualOption.index].value
                       ? "opacity-100"
@@ -183,8 +183,10 @@ const VirtualizedCommand = ({
   )
 }
 
-interface VirtualizedComboboxProps {
+interface VirtualizedComboboxProps extends React.ComponentProps<"select"> {
   options: string[]
+  onSelectOption?: (option: string) => void
+  selectPlaceholder?: string
   searchPlaceholder?: string
   width?: string
   height?: string
@@ -192,6 +194,8 @@ interface VirtualizedComboboxProps {
 
 export function VirtualizedCombobox({
   options,
+  onSelectOption: onSelectOptionFromProps,
+  selectPlaceholder = "Select an item",
   searchPlaceholder = "Search items...",
   width = "400px",
   height = "400px",
@@ -213,8 +217,8 @@ export function VirtualizedCombobox({
         >
           {selectedOption
             ? options.find((option) => option === selectedOption)
-            : searchPlaceholder}
-          <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+            : selectPlaceholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" style={{ width: width }}>
@@ -224,9 +228,14 @@ export function VirtualizedCombobox({
           placeholder={searchPlaceholder}
           selectedOption={selectedOption}
           onSelectOption={(currentValue) => {
-            setSelectedOption(
-              currentValue === selectedOption ? "" : currentValue,
-            )
+            if (currentValue === selectedOption) {
+              onSelectOptionFromProps?.("")
+              setSelectedOption("")
+              setOpen(false)
+              return
+            }
+            onSelectOptionFromProps?.(currentValue)
+            setSelectedOption(currentValue)
             setOpen(false)
           }}
         />

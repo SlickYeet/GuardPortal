@@ -11,7 +11,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    autoSignIn: true,
   },
   plugins: [nextCookies()], // make sure nextCookies() is the last plugin in the array
 })

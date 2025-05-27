@@ -7,6 +7,7 @@ import { z } from "zod"
 import { env } from "@/env"
 import { SignInSchema, SignUpSchema } from "@/schemas/auth"
 import { auth } from "@/server/auth"
+import { db } from "@/server/db"
 
 export async function createFirstUserAsAdmin(
   values: z.infer<typeof SignUpSchema>,
@@ -30,6 +31,13 @@ export async function createFirstUserAsAdmin(
       error: `Sign up failed: ${errorJson.message}`,
     }
   }
+
+  await db.user.update({
+    where: { email },
+    data: {
+      emailVerified: true,
+    },
+  })
 
   return redirect("/vpn")
 }

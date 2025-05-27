@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { parsePeerConfig } from "@/lib/wireguard"
 import { UserWithConfig } from "@/types"
 
 export function UsersList() {
@@ -100,8 +101,8 @@ export function UsersList() {
   }
 
   function getIpAddress(config: string) {
-    const match = config.match(/Address\s*=\s*(.+)/)
-    return match?.[1] || "N/A"
+    const parsedConfig = parsePeerConfig(config)
+    return parsedConfig.allowedIPs || "N/A"
   }
 
   return (

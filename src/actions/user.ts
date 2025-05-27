@@ -1,6 +1,7 @@
 "use server"
 
 import { hash } from "bcryptjs"
+import { z } from "zod"
 
 import { addPeerConfig } from "@/actions/wireguard"
 import { generateTemporaryPassword } from "@/lib/password"
@@ -8,15 +9,17 @@ import { userSchema } from "@/schemas/user"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
 
-export async function createNewUser(data: { name: string; email: string }) {
+export async function createNewUser(values: z.infer<typeof userSchema>) {
   try {
-    const validatedData = userSchema.parse(data)
+    const validatedData = userSchema.parse(values)
 
-    const existingUsers = await db.user.findMany({
+    console.log("Creating new user with data:", validatedData)
+
+    const existingUsers = await db.user.count({
       where: { email: validatedData.email },
     })
 
-    if (existingUsers) {
+    if (existingUsers > 0) {
       return {
         success: false,
         message: "User with this email already exists.",
@@ -27,8 +30,8 @@ export async function createNewUser(data: { name: string; email: string }) {
     const hashedPassword = await hash(tempPassword, 12)
 
     const wireguardConfig = await addPeerConfig(
-      validatedData.ipAddress,
       validatedData.name,
+      validatedData.ipAddress,
     )
 
     const newUser = await auth.api.signUpEmail({
@@ -59,7 +62,7 @@ export async function createNewUser(data: { name: string; email: string }) {
       await tx.peerConfig.create({
         data: {
           name: `${validatedData.name}'s Config`,
-          config: wireguardConfig,
+          config: JSON.stringify(wireguardConfig),
           userId: user.id,
         },
       })
