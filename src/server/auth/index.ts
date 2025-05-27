@@ -12,5 +12,10 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   plugins: [nextCookies()], // make sure nextCookies() is the last plugin in the array
 })

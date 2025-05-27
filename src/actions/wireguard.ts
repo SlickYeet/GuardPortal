@@ -91,7 +91,7 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
     },
     body: JSON.stringify({
       name: `${name}'s Config`,
-      allowed_ips: [ipAddress],
+      ...(ipAddress ? { allowed_ips: [ipAddress] } : {}),
     }),
   }
 

@@ -115,11 +115,18 @@ export async function getUsers() {
 
 export async function deleteUser(userId: string) {
   try {
-    await db.user.delete({
+    const deletedUser = await db.user.delete({
       where: { id: userId },
     })
 
-    // TODO: Delete associated peer config
+    if (!deletedUser) {
+      return {
+        success: false,
+        message: "User not found.",
+      }
+    }
+
+    // TODO: Delete associated peer config on wg
 
     return {
       success: true,
