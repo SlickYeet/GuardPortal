@@ -4,6 +4,7 @@ import { type User } from "better-auth"
 import { LogOut, Shield, SunMoon } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import { signOut } from "@/actions/auth"
 import { Hint } from "@/components/hint"
@@ -24,6 +25,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user, isAdmin = false }: UserMenuProps) {
+  const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
 
   const isDark = resolvedTheme === "dark"
@@ -80,9 +82,9 @@ export function UserMenu({ user, isAdmin = false }: UserMenuProps) {
           </DropdownMenuItem>
           {isAdmin && (
             <DropdownMenuItem asChild>
-              <Link href="/admin">
+              <Link href={pathname === "/admin" ? "/vpn" : "/admin"}>
                 <Shield className="size-4" />
-                Admin Dashboard
+                {pathname === "/admin" ? "VPN Details" : "Admin Dashboard"}
               </Link>
             </DropdownMenuItem>
           )}

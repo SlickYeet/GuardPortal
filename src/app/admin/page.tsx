@@ -1,10 +1,7 @@
-import { ArrowLeft } from "lucide-react"
 import { headers } from "next/headers"
-import Link from "next/link"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -34,15 +31,9 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto max-w-7xl py-10">
       <div className="flex items-center justify-between">
         <h1 className="mb-6 text-3xl font-bold">VPN Admin Dashboard</h1>
-        <Button variant="outline" asChild>
-          <Link href="/vpn" className="text-sm">
-            <ArrowLeft className="size-4" />
-            Go to VPN Details
-          </Link>
-        </Button>
         <UserMenu user={session.user} isAdmin={isAdmin} />
       </div>
 
