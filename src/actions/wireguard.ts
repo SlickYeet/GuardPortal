@@ -21,7 +21,7 @@ export async function getDefaultPeerConfig() {
 }
 
 export async function getPeerConfig({ peerId }: { peerId?: string } = {}) {
-  const defaultPeerId = "1oS/wdQvRS6cCigcbbc6rQ4VLWVSJbKN0/ZcmOTOTT0="
+  const defaultPeerId = env.WIREGUARD_DEFAULT_PEER_PUBLIC_KEY
 
   const requestOptions: RequestInit = {
     method: "GET",
