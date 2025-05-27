@@ -9,7 +9,7 @@ export default async function HomePage() {
   const userCount = await db.user.count()
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center py-12 md:-mt-20 md:py-0">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <span className="text-muted-foreground text-sm tracking-wide">
