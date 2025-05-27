@@ -13,8 +13,6 @@ export async function createNewUser(values: z.infer<typeof userSchema>) {
   try {
     const validatedData = userSchema.parse(values)
 
-    console.log("Creating new user with data:", validatedData)
-
     const existingUsers = await db.user.count({
       where: { email: validatedData.email },
     })
