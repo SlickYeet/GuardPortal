@@ -9,7 +9,7 @@ export function parsePeerConfig(config: string) {
     }
   } catch {
     const serverMatch = config.match(/Endpoint\s*=\s*(.+)/)
-    const allowedIPsMatch = config.match(/AllowedIPs\s*=\s*(.+)/)
+    const allowedIPsMatch = config.match(/Address\s*=\s*(.+)/)
     const dnsMatch = config.match(/DNS\s*=\s*(.+)/)
 
     return {
