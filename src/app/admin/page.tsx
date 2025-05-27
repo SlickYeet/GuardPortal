@@ -31,48 +31,50 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl py-10">
-      <div className="flex items-center justify-between">
-        <h1 className="mb-6 text-3xl font-bold">VPN Admin Dashboard</h1>
-        <UserMenu user={session.user} isAdmin={isAdmin} />
+    <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl">
+        <div className="flex items-center justify-between">
+          <h1 className="mb-6 text-3xl font-bold">VPN Admin Dashboard</h1>
+          <UserMenu user={session.user} isAdmin={isAdmin} />
+        </div>
+
+        <AdminTabs>
+          <TabsContent value="create-user">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create New VPN User</CardTitle>
+                <CardDescription>
+                  Create a new user with a temporary password and assign an IP
+                  address.
+                  <br />
+                  An email will be sent to the user with their credentials.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<CreateUserFormSkeleton />}>
+                  <CreateUserForm />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="manage-users">
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage VPN Users</CardTitle>
+                <CardDescription>
+                  View and manage existing VPN users
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<UsersListSkeleton />}>
+                  <UsersList />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </AdminTabs>
       </div>
-
-      <AdminTabs>
-        <TabsContent value="create-user">
-          <Card>
-            <CardHeader>
-              <CardTitle>Create New VPN User</CardTitle>
-              <CardDescription>
-                Create a new user with a temporary password and assign an IP
-                address.
-                <br />
-                An email will be sent to the user with their credentials.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<CreateUserFormSkeleton />}>
-                <CreateUserForm />
-              </Suspense>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="manage-users">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage VPN Users</CardTitle>
-              <CardDescription>
-                View and manage existing VPN users
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={<UsersListSkeleton />}>
-                <UsersList />
-              </Suspense>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </AdminTabs>
     </div>
   )
 }
