@@ -13,8 +13,8 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "clean": "rm -rf .next node_modules && bun install",
-    "shadcn": "bunx --bun shadcn@latest"
+    "clean": "rm -rf .next node_modules && pnpm install",
+    "shadcn": "pnpm dlx shadcn@latest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -68,6 +68,5 @@
   },
   "ctntaMetadata": {
     "initVersion": "0.6.0"
-  },
-  "packageManager": "bun@1.2.14"
+  }
 }
