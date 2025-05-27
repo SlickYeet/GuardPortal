@@ -30,8 +30,8 @@ export async function getPeerConfig({ peerId }: { peerId?: string } = {}) {
 
   const json = await response.json()
   return {
-    config: json.data.file,
-    fileName: json.data.fileName,
+    config: json.data.file as string,
+    fileName: json.data.fileName as string,
   }
 }
 

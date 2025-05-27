@@ -1,21 +1,21 @@
-export function parsePeerConfig(configJson: string) {
-  const configArr = JSON.parse(configJson)
-  if (!Array.isArray(configArr) || configArr.length === 0) {
-    throw new Error("Invalid config: not an array or empty")
-  }
-  const config = configArr[0]
+export function parsePeerConfig(config: string) {
+  try {
+    const parsed = JSON.parse(config)
+    const peer = Array.isArray(parsed) ? parsed[0] : parsed
+    return {
+      server: peer.endpoint ?? "",
+      allowedIPs: peer.allowed_ip ?? "",
+      dns: peer.DNS ?? "",
+    }
+  } catch {
+    const serverMatch = config.match(/Endpoint\s*=\s*(.+)/)
+    const allowedIPsMatch = config.match(/AllowedIPs\s*=\s*(.+)/)
+    const dnsMatch = config.match(/DNS\s*=\s*(.+)/)
 
-  return {
-    server: config.remote_endpoint ?? "",
-    allowedIPs: config.allowed_ip ?? config.endpoint_allowed_ip ?? "",
-    dns: config.DNS ?? "",
-    name: config.name ?? "",
-    publicKey: config.configuration?.PublicKey ?? "",
-    privateKey: config.private_key ?? "",
-    mtu: config.mtu ?? "",
-    keepalive: config.keepalive ?? "",
-    status: config.status ?? "",
-    address: config.configuration?.Address ?? "",
-    listenPort: config.configuration?.ListenPort ?? "",
+    return {
+      server: serverMatch?.[1] ?? "",
+      allowedIPs: allowedIPsMatch?.[1] ?? "",
+      dns: dnsMatch?.[1] ?? "",
+    }
   }
 }
