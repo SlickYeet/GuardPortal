@@ -1,6 +1,7 @@
 "use server"
 
 import { env } from "@/env"
+import { db } from "@/server/db"
 
 if (env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
@@ -33,6 +34,28 @@ export async function getPeerConfig({ peerId }: { peerId?: string } = {}) {
     config: json.data.file as string,
     fileName: json.data.fileName as string,
   }
+}
+
+export async function getPeerConfigByUserId(userId: string) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { email: true, config: true },
+  })
+
+  if (!user || (!user.config && env.ADMIN_EMAIL !== user.email)) {
+    throw new Error(`No peer config found for user with ID: ${userId}`)
+  } else if (env.ADMIN_EMAIL === user.email) {
+    const defaultConfig = await getPeerConfig()
+
+    const config = {
+      config: defaultConfig.config,
+      name: defaultConfig.fileName,
+    }
+
+    return config
+  }
+
+  return user.config
 }
 
 export async function getAvailablePeerIPs() {

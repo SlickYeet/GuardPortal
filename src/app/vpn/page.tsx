@@ -7,8 +7,9 @@ import {
   Settings,
   Settings2,
 } from "lucide-react"
+import { headers } from "next/headers"
 
-import { getPeerConfig } from "@/actions/wireguard"
+import { getPeerConfigByUserId } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
 import { SignOutForm } from "@/app/vpn/_components/sign-out-form"
 import { QRCodeDisplay } from "@/components/qr-code-display"
@@ -21,13 +22,35 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { parsePeerConfig } from "@/lib/wireguard"
+import { auth } from "@/server/auth"
 
 export default async function VPNPage() {
-  const wireguardConfig = await getPeerConfig()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  const user = session?.user
+
+  const wireguardConfig = await getPeerConfigByUserId(user!.id)
+
+  if (!wireguardConfig) {
+    return (
+      <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <h1 className="text-primary text-3xl font-bold">
+            No VPN configuration found
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Please contact your administrator to set up your VPN.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   const details = parsePeerConfig(wireguardConfig.config)
 
   const CONFIG_DETAILS = [
-    { label: "Name", value: wireguardConfig.fileName, icon: FileText },
+    { label: "Name", value: wireguardConfig.name, icon: FileText },
     { label: "Server", value: details.server, icon: Server },
     { label: "Allowed IPs", value: details.allowedIPs, icon: Globe },
     { label: "DNS", value: details.dns, icon: CloudCog },
