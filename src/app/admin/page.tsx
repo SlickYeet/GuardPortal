@@ -13,11 +13,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TabsContent } from "@/components/ui/tabs"
 import { isUserAdmin } from "@/lib/utils"
 import { auth } from "@/server/auth"
 
 import { CreateUserForm } from "./_components/create-user-form"
+import { AdminTabs } from "./_components/tabs"
 import { UsersList } from "./_components/user-list"
 
 export default async function AdminPage() {
@@ -43,12 +44,7 @@ export default async function AdminPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="create-user" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="create-user">Create User</TabsTrigger>
-          <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
-        </TabsList>
-
+      <AdminTabs>
         <TabsContent value="create-user">
           <Card>
             <CardHeader>
@@ -83,7 +79,7 @@ export default async function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+      </AdminTabs>
     </div>
   )
 }

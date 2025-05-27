@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 import { deleteUser, getUsers, resetUserPassword } from "@/actions/user"
+import { Hint } from "@/components/hint"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -119,7 +120,7 @@ export function UsersList() {
 
       {isLoading ? (
         <div className="flex justify-center p-8">
-          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <Loader2 className="text-muted-foreground size-8 animate-spin" />
         </div>
       ) : users.length === 0 ? (
         <div className="text-muted-foreground p-8 text-center">
@@ -133,7 +134,7 @@ export function UsersList() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>IP Address</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,26 +148,30 @@ export function UsersList() {
                       : "No config"}
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        disabled={isResetting === user.id}
-                        onClick={() => handleResetPassword(user.id)}
-                        size="sm"
-                        variant="outline"
-                      >
-                        {isResetting === user.id ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <Key className="size-4" />
-                        )}
-                      </Button>
-                      <Button
-                        onClick={() => setUserToDelete(user.id)}
-                        size="sm"
-                        variant="destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                    <div className="flex justify-end space-x-2">
+                      <Hint label="Reset Password" asChild>
+                        <Button
+                          disabled={isResetting === user.id}
+                          onClick={() => handleResetPassword(user.id)}
+                          size="sm"
+                          variant="outline"
+                        >
+                          {isResetting === user.id ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <Key className="size-4" />
+                          )}
+                        </Button>
+                      </Hint>
+                      <Hint label="Delete User" asChild>
+                        <Button
+                          onClick={() => setUserToDelete(user.id)}
+                          size="sm"
+                          variant="destructive"
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </Hint>
                     </div>
                   </TableCell>
                 </TableRow>
