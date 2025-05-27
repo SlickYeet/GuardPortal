@@ -11,7 +11,6 @@ import { headers } from "next/headers"
 
 import { getPeerConfigByUserId } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
-import { SignOutForm } from "@/app/vpn/_components/sign-out-form"
 import { QRCodeDisplay } from "@/components/qr-code-display"
 import {
   Card,
@@ -21,6 +20,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { UserMenu } from "@/components/user-menu"
+import { isUserAdmin } from "@/lib/utils"
 import { parsePeerConfig } from "@/lib/wireguard"
 import { auth } from "@/server/auth"
 
@@ -29,6 +30,8 @@ export default async function VPNPage() {
     headers: await headers(),
   })
   const user = session?.user
+
+  const isAdmin = isUserAdmin(session?.user)
 
   const wireguardConfig = await getPeerConfigByUserId(user!.id)
 
@@ -68,7 +71,7 @@ export default async function VPNPage() {
               Scan the QR code or download the configuration file
             </p>
           </div>
-          <SignOutForm />
+          <UserMenu user={session!.user} isAdmin={isAdmin} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TabsContent } from "@/components/ui/tabs"
+import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
 import { auth } from "@/server/auth"
 
@@ -42,6 +43,7 @@ export default async function AdminPage() {
             Go to VPN Details
           </Link>
         </Button>
+        <UserMenu user={session.user} isAdmin={isAdmin} />
       </div>
 
       <AdminTabs>
