@@ -2,6 +2,8 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 
+import { getDefaultPeerConfig } from "@/actions/wireguard"
+import { CreateConfigForm } from "@/app/admin/_components/create-config-form"
 import {
   Card,
   CardContent,
@@ -30,6 +32,8 @@ export default async function AdminPage() {
     return redirect("/")
   }
 
+  const defaultConfig = await getDefaultPeerConfig()
+
   return (
     <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
@@ -53,6 +57,22 @@ export default async function AdminPage() {
               <CardContent>
                 <Suspense fallback={<CreateUserFormSkeleton />}>
                   <CreateUserForm />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="create-config">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create VPN Config</CardTitle>
+                <CardDescription>
+                  Generate a new VPN configuration file for an existing user.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<CreateConfigFormSkeleton />}>
+                  <CreateConfigForm defaultConfig={defaultConfig} />
                 </Suspense>
               </CardContent>
             </Card>
@@ -83,6 +103,16 @@ function CreateUserFormSkeleton() {
   return (
     <div className="space-y-4">
       <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-1/3" />
+    </div>
+  )
+}
+
+function CreateConfigFormSkeleton() {
+  return (
+    <div className="space-y-4">
       <Skeleton className="h-10 w-full" />
       <Skeleton className="h-10 w-full" />
       <Skeleton className="h-10 w-1/3" />

@@ -1,10 +1,23 @@
 "use server"
 
+import { readFile } from "fs/promises"
+import path from "path"
+
 import { env } from "@/env"
 import { db } from "@/server/db"
 
 if (env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+}
+
+export async function getDefaultPeerConfig() {
+  const filePath = path.join(
+    process.cwd(),
+    "src",
+    "config",
+    "default-peer-config.conf",
+  )
+  return await readFile(filePath, "utf-8")
 }
 
 export async function getPeerConfig({ peerId }: { peerId?: string } = {}) {

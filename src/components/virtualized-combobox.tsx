@@ -210,14 +210,16 @@ export function VirtualizedCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="justify-between"
+          className="cursor-default justify-between"
           style={{
             width: width,
           }}
         >
-          {selectedOption
-            ? options.find((option) => option === selectedOption)
-            : selectPlaceholder}
+          {selectedOption ? (
+            options.find((option) => option === selectedOption)
+          ) : (
+            <span className="text-muted-foreground">{selectPlaceholder}</span>
+          )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

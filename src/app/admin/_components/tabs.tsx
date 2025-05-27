@@ -5,7 +5,8 @@ import { useCallback, useState, type ReactNode } from "react"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-type TabValue = "create-user" | "manage-users"
+const validTabs = ["create-user", "create-config", "manage-users"]
+type TabValue = (typeof validTabs)[number]
 
 export function AdminTabs({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -14,8 +15,8 @@ export function AdminTabs({ children }: { children: ReactNode }) {
 
   const [activeTab, setActiveTab] = useState<TabValue>(() => {
     const urlTab = searchParams.get("tab")
-    return urlTab === "create-user" || urlTab === "manage-users"
-      ? urlTab
+    return validTabs.includes(urlTab as TabValue)
+      ? (urlTab as TabValue)
       : "create-user"
   })
 
@@ -43,6 +44,7 @@ export function AdminTabs({ children }: { children: ReactNode }) {
     >
       <TabsList>
         <TabsTrigger value="create-user">Create User</TabsTrigger>
+        <TabsTrigger value="create-config">Create Config</TabsTrigger>
         <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
       </TabsList>
 

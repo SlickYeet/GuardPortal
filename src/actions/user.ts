@@ -5,13 +5,13 @@ import { z } from "zod"
 
 import { addPeerConfig } from "@/actions/wireguard"
 import { generateTemporaryPassword } from "@/lib/password"
-import { userSchema } from "@/schemas/user"
+import { UserSchema } from "@/schemas/user"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
 
-export async function createNewUser(values: z.infer<typeof userSchema>) {
+export async function createNewUser(values: z.infer<typeof UserSchema>) {
   try {
-    const validatedData = userSchema.parse(values)
+    const validatedData = UserSchema.parse(values)
 
     const existingUsers = await db.user.count({
       where: { email: validatedData.email },

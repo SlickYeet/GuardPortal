@@ -1,8 +1,9 @@
 import { z } from "zod"
 
-export const UserSchema = z.object({
+export const ConfigSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters long"),
-  email: z.string().email("Invalid email address"),
+  content: z.string(),
+  userId: z.string().min(1, "User is required"),
   ipAddress: z
     .string()
     .optional()

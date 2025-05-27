@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
 import { cn } from "@/lib/utils"
-import { userSchema } from "@/schemas/user"
+import { UserSchema } from "@/schemas/user"
 
 export function CreateUserForm() {
   const [availableIps, setAvailableIps] = useState<string[]>([])
@@ -28,8 +28,8 @@ export function CreateUserForm() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<z.infer<typeof userSchema>>({
-    resolver: zodResolver(userSchema),
+  } = useForm<z.infer<typeof UserSchema>>({
+    resolver: zodResolver(UserSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -41,7 +41,7 @@ export function CreateUserForm() {
     loadAvailableIps()
   }, [])
 
-  async function loadAvailableIps() {
+  const loadAvailableIps = async () => {
     setIsLoadingIps(true)
     try {
       const ipsObj = await getAvailablePeerIPs()
@@ -59,7 +59,7 @@ export function CreateUserForm() {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof userSchema>) {
+  const onSubmit = async (values: z.infer<typeof UserSchema>) => {
     setIsLoading(true)
     try {
       const result = await createNewUser(values)
@@ -93,7 +93,7 @@ export function CreateUserForm() {
         <Label htmlFor="name">Name</Label>
         <Input id="name" {...register("name")} placeholder="John Doe" />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-destructive text-sm">{errors.name.message}</p>
         )}
       </div>
 
@@ -106,7 +106,7 @@ export function CreateUserForm() {
           type="email"
         />
         {errors.email && (
-          <p className="text-sm text-red-500">{errors.email.message}</p>
+          <p className="text-destructive text-sm">{errors.email.message}</p>
         )}
       </div>
 
@@ -147,7 +147,7 @@ export function CreateUserForm() {
         </p>
 
         {errors.ipAddress && (
-          <p className="text-sm text-red-500">{errors.ipAddress.message}</p>
+          <p className="text-destructive text-sm">{errors.ipAddress.message}</p>
         )}
       </div>
 
