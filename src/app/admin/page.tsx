@@ -62,6 +62,22 @@ export default async function AdminPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="manage-users">
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage VPN Users</CardTitle>
+                <CardDescription>
+                  View and manage existing VPN users
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<UsersListSkeleton />}>
+                  <UsersList />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="create-config">
             <Card>
               <CardHeader>
@@ -78,18 +94,18 @@ export default async function AdminPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="manage-users">
+          <TabsContent value="manage-configs">
             <Card>
               <CardHeader>
-                <CardTitle>Manage VPN Users</CardTitle>
+                <CardTitle>Manage VPN Configs</CardTitle>
                 <CardDescription>
-                  View and manage existing VPN users
+                  View and manage existing VPN configurations
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Suspense fallback={<UsersListSkeleton />}>
-                  <UsersList />
-                </Suspense>
+                <p className="text-muted-foreground">
+                  This feature is under development.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

@@ -5,7 +5,12 @@ import { useCallback, useState, type ReactNode } from "react"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const validTabs = ["create-user", "create-config", "manage-users"]
+const validTabs = [
+  "create-user",
+  "create-config",
+  "manage-users",
+  "manage-configs",
+] as const
 type TabValue = (typeof validTabs)[number]
 
 export function AdminTabs({ children }: { children: ReactNode }) {
@@ -44,8 +49,9 @@ export function AdminTabs({ children }: { children: ReactNode }) {
     >
       <TabsList>
         <TabsTrigger value="create-user">Create User</TabsTrigger>
-        <TabsTrigger value="create-config">Create Config</TabsTrigger>
         <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
+        <TabsTrigger value="create-config">Create Config</TabsTrigger>
+        <TabsTrigger value="manage-configs">Manage Configs</TabsTrigger>
       </TabsList>
 
       {children}

@@ -8,6 +8,7 @@ import {
   Settings2,
 } from "lucide-react"
 import { headers } from "next/headers"
+import Link from "next/link"
 
 import { getPeerConfigByUserId } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
@@ -44,6 +45,14 @@ export default async function VPNPage() {
           </h1>
           <p className="text-muted-foreground mt-2">
             Please contact your administrator to set up your VPN.
+            <br /> If you are the administrator,{" "}
+            <Link
+              href="/admin?tab=create-config"
+              className="text-primary hover:underline"
+            >
+              go to the admin panel
+            </Link>{" "}
+            to create a new VPN configuration.
           </p>
         </div>
       </div>

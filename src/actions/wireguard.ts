@@ -20,52 +20,14 @@ export async function getDefaultPeerConfig() {
   return await readFile(filePath, "utf-8")
 }
 
-export async function getPeerConfig({ peerId }: { peerId?: string } = {}) {
-  const defaultPeerId = env.WIREGUARD_DEFAULT_PEER_PUBLIC_KEY
-
-  const requestOptions: RequestInit = {
-    method: "GET",
-    headers: {
-      "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
-    },
-    redirect: "follow",
-  }
-
-  const response = await fetch(
-    `${env.WIREGUARD_API_ENDPOINT}/downloadPeer/wg0?id=${encodeURIComponent(
-      peerId || defaultPeerId,
-    )}`,
-    requestOptions,
-  )
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch peer config: ${response.statusText}`)
-  }
-
-  const json = await response.json()
-  return {
-    config: json.data.file as string,
-    fileName: json.data.fileName as string,
-  }
-}
-
 export async function getPeerConfigByUserId(userId: string) {
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { email: true, config: true },
   })
 
-  if (!user || (!user.config && env.ADMIN_EMAIL !== user.email)) {
-    throw new Error(`No peer config found for user with ID: ${userId}`)
-  } else if (env.ADMIN_EMAIL === user.email) {
-    const defaultConfig = await getPeerConfig()
-
-    const config = {
-      config: defaultConfig.config,
-      name: defaultConfig.fileName,
-    }
-
-    return config
+  if (!user || !user.config) {
+    return null
   }
 
   return user.config
@@ -105,6 +67,7 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
     body: JSON.stringify({
       name: `${name}'s Config`,
       ...(ipAddress ? { allowed_ips: [ipAddress] } : {}),
+      endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
     }),
   }
 
