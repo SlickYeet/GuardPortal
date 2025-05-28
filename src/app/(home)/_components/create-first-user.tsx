@@ -44,12 +44,6 @@ export function CreateFirstUser() {
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
-        <CardDescription>
-          All fields are optional.
-          <br />
-          If you leave the fields empty, the credentials from your .env file
-          will be used.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -61,7 +55,7 @@ export function CreateFirstUser() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input type="text" placeholder="Your Name" {...field} />
+                    <Input placeholder="Your Name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

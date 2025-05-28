@@ -1,12 +1,13 @@
 "use client"
 
+import { type PeerConfig } from "@prisma/client"
 import { CheckCircle, Copy, CopyCheck, Download } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 
-export function DetailsCardButtons({ config }: { config: string }) {
+export function DetailsCardButtons({ config }: { config: PeerConfig }) {
   const [state, setState] = useState({
     error: {
       download: "",
@@ -16,11 +17,13 @@ export function DetailsCardButtons({ config }: { config: string }) {
     copied: false,
   })
 
+  const configString = JSON.stringify(config)
+
   const downloadConfig = () => {
     try {
       setState((prev) => ({ ...prev, downloading: true }))
 
-      const blob = new Blob([config], { type: "text/plain" })
+      const blob = new Blob([configString], { type: "text/plain" })
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
 
@@ -51,7 +54,7 @@ export function DetailsCardButtons({ config }: { config: string }) {
 
   const copyConfig = () => {
     navigator.clipboard
-      .writeText(config)
+      .writeText(configString)
       .then(() => {
         setState((prev) => ({ ...prev, copied: true }))
         toast.success("Configuration copied to clipboard", {

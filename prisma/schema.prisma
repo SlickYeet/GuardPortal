@@ -72,11 +72,36 @@ model Verification {
 }
 
 model PeerConfig {
-    id        String   @id @default(cuid())
-    name      String
-    config    String
+    id                String  @id @default(cuid())
+    name              String
+    publicKey         String
+    privateKey        String
+    allowedIPs        String
+    endpoint          String
+    endpointAllowedIP String
+    dns               String
+    preSharedKey      String?
+    mtu               Int?    @default(1420)
+    keepAlive         Int?    @default(21)
+
+    configurationId String
+    configuration   Configuration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+    userId String? @unique
+    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    userId    String?  @unique
-    user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Configuration {
+    id             String @id @default(cuid())
+    name           String
+    address        String
+    connectedPeers Int
+    listenPort     String
+    publicKey      String
+    privateKey     String
+
+    PeerConfig PeerConfig[]
 }

@@ -23,7 +23,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
-import { parsePeerConfig } from "@/lib/wireguard"
 import { auth } from "@/server/auth"
 
 export default async function VPNPage() {
@@ -59,13 +58,11 @@ export default async function VPNPage() {
     )
   }
 
-  const details = parsePeerConfig(wireguardConfig.config)
-
   const CONFIG_DETAILS = [
     { label: "Name", value: wireguardConfig.name, icon: FileText },
-    { label: "Server", value: details.server, icon: Server },
-    { label: "Allowed IPs", value: details.allowedIPs, icon: Globe },
-    { label: "DNS", value: details.dns, icon: CloudCog },
+    { label: "Server", value: wireguardConfig.endpoint, icon: Server },
+    { label: "Allowed IPs", value: wireguardConfig.allowedIPs, icon: Globe },
+    { label: "DNS", value: wireguardConfig.dns, icon: CloudCog },
   ]
 
   return (
@@ -96,7 +93,7 @@ export default async function VPNPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <QRCodeDisplay value={wireguardConfig.config} />
+              <QRCodeDisplay config={wireguardConfig} />
             </CardContent>
           </Card>
 
@@ -120,7 +117,7 @@ export default async function VPNPage() {
                   <p className="text-sm">{value}</p>
                 </div>
               ))}
-              <DetailsCardButtons config={wireguardConfig.config} />
+              <DetailsCardButtons config={wireguardConfig} />
             </CardContent>
           </Card>
         </div>

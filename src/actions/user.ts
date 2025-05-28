@@ -56,11 +56,10 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
         throw new Error("User not found after creation.")
       }
 
-      // Create peer config
       await tx.peerConfig.create({
         data: {
+          ...wireguardConfig,
           name: `${validatedData.name}'s Config`,
-          config: JSON.stringify(wireguardConfig),
           userId: user.id,
         },
       })
@@ -94,7 +93,16 @@ export async function getUsers() {
         config: {
           select: {
             id: true,
-            config: true,
+            name: true,
+            allowedIPs: true,
+            endpoint: true,
+            dns: true,
+            configuration: {
+              select: {
+                name: true,
+                address: true,
+              },
+            },
           },
         },
       },
@@ -103,14 +111,16 @@ export async function getUsers() {
       },
     })
 
+    if (!users || users.length === 0) {
+      return null
+    }
+
     return users
   } catch (error) {
     console.error("Error fetching users:", error)
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Unknown error occurred.",
-    }
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred.",
+    )
   }
 }
 

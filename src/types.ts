@@ -1,21 +1,30 @@
-export type UserWithConfig = {
+export type User = {
   id: string
   name: string
   email: string
-  config: {
-    id: string
-    config: string
-  }
+  image: string
+  config?: PeerConfig | null
 }
 
-export type PeerConfigWithUser = {
+export type PeerConfig = {
   id: string
   name: string
-  config: string
-  user: {
-    id: string
-    name: string
-    email: string
-    image: string
-  }
+  allowedIPs: string
+  endpoint: string
+  dns: string
+  configuration: Configuration
+}
+
+export type Configuration = {
+  name: string
+  address: string
+  listenPort: string
+}
+
+export type UserWithConfig = User & {
+  config?: PeerConfig | null
+}
+
+export type PeerConfigWithUser = PeerConfig & {
+  user: User
 }

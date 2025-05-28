@@ -2,6 +2,7 @@
 
 import { readFile } from "fs/promises"
 import path from "path"
+import { PeerConfig } from "@prisma/client"
 
 import { env } from "@/env"
 import { db } from "@/server/db"
@@ -12,7 +13,7 @@ export async function getDefaultPeerConfig() {
       process.cwd(),
       "src",
       "config",
-      "default-peer-config.conf",
+      "placeholder-peer-config.conf",
     )
     const config = await readFile(filePath, "utf-8")
     return config
@@ -40,11 +41,9 @@ export async function getPeerConfigByUserId(userId: string) {
     return user.config
   } catch (error) {
     console.error("Error fetching peer config by user ID:", error)
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Unknown error occurred",
-    }
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred",
+    )
   }
 }
 
@@ -121,7 +120,16 @@ export async function getPeerConfigsFromDB() {
       select: {
         id: true,
         name: true,
-        config: true,
+        allowedIPs: true,
+        endpoint: true,
+        dns: true,
+        configuration: {
+          select: {
+            name: true,
+            address: true,
+            listenPort: true,
+          },
+        },
         user: {
           select: {
             id: true,
@@ -140,11 +148,10 @@ export async function getPeerConfigsFromDB() {
     return peerConfigs
   } catch (error) {
     console.error("Error fetching peer configs from DB:", error)
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Unknown error occurred",
-    }
+
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred",
+    )
   }
 }
 
@@ -176,11 +183,9 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
     return json.data
   } catch (error) {
     console.error("Error adding peer config:", error)
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Unknown error occurred",
-    }
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred",
+    )
   }
 }
 
@@ -191,6 +196,38 @@ export async function deletePeerConfig(id: string) {
 
   if (!configToDelete) {
     throw new Error("Peer config not found")
+  }
+
+  const jobPayload = {
+    job: {
+      JobID: `delete-peer-${id}`,
+      Configuration: "",
+      Peer: "",
+      Field: "total_data",
+      Operator: "lgt",
+      Value: "0",
+      CreationDate: "",
+      ExpireDate: "",
+      Action: "delete",
+    },
+  }
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+    },
+    body: JSON.stringify(jobPayload),
+  }
+
+  const response = await fetch(
+    `${env.WIREGUARD_API_ENDPOINT}/savePeerScheduleJob`,
+    requestOptions,
+  )
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete peer config: ${response.statusText}`)
   }
 
   await db.peerConfig.delete({

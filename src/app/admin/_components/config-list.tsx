@@ -1,6 +1,6 @@
 "use client"
 
-import { Loader2, RefreshCcw, Trash2 } from "lucide-react"
+import { Edit, Loader2, RefreshCcw, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -19,6 +19,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
@@ -32,7 +41,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { parsePeerConfig } from "@/lib/wireguard"
 import type { PeerConfigWithUser } from "@/types"
 
 export function ConfigList() {
@@ -40,12 +48,11 @@ export function ConfigList() {
   const [isLoading, setIsLoading] = useState(true)
   const [configToDelete, setConfigToDelete] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     loadConfigs()
   }, [])
-
-  console.log("Configs loaded:", configs)
 
   async function loadConfigs() {
     setIsLoading(true)
@@ -81,11 +88,6 @@ export function ConfigList() {
     }
   }
 
-  const parsedConfigs = configs.map((config) => ({
-    ...config,
-    parsedConfig: parsePeerConfig(config.config),
-  }))
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -116,21 +118,22 @@ export function ConfigList() {
                 <TableHead>Server</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>DNS</TableHead>
-                <TableHead>User</TableHead>
+                <TableHead>Assignee</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {parsedConfigs.map((config) => (
+              {configs.map((config) => (
                 <TableRow key={config.id}>
                   <TableCell className="truncate font-medium">
                     {config.name || "Unnamed Peer"}
                   </TableCell>
-                  <TableCell>{config.parsedConfig.server || "N/A"}</TableCell>
                   <TableCell>
-                    {config.parsedConfig.allowedIPs || "N/A"}
+                    {`${config.endpoint}:${config.configuration.listenPort}` ||
+                      "N/A"}
                   </TableCell>
-                  <TableCell>{config.parsedConfig.dns || "N/A"}</TableCell>
+                  <TableCell>{config.allowedIPs || "N/A"}</TableCell>
+                  <TableCell>{config.dns || "N/A"}</TableCell>
                   {config.user ? (
                     <TableCell>
                       <HoverCard openDelay={100}>
@@ -171,6 +174,17 @@ export function ConfigList() {
                   )}
                   <TableCell>
                     <div className="flex justify-end space-x-2">
+                      <Hint label="Edit Config" asChild>
+                        <Button
+                          disabled={isEditing}
+                          onClick={() => setIsEditing(true)}
+                          size="icon"
+                          variant="outline"
+                        >
+                          <span className="sr-only">View Config</span>
+                          <Edit className="size-4" />
+                        </Button>
+                      </Hint>
                       <Hint label="Delete Config" asChild>
                         <Button
                           disabled={isDeleting}
@@ -230,6 +244,27 @@ export function ConfigList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Config</DialogTitle>
+            <DialogDescription>
+              This functionality is not implemented yet.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <div className="flex w-full justify-between">
+              <DialogClose asChild>
+                <Button onClick={() => setIsEditing(false)} variant="outline">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button>Save Changes</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

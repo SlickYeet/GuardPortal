@@ -39,14 +39,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
 import { cn } from "@/lib/utils"
 import { ConfigSchema } from "@/schemas/config"
-import { UserWithConfig } from "@/types"
+import { User } from "@/types"
 
 export function CreateConfigForm({
   defaultConfig,
 }: {
   defaultConfig?: string
 }) {
-  const [users, setUsers] = useState<UserWithConfig[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [availableIps, setAvailableIps] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
@@ -70,7 +70,7 @@ export function CreateConfigForm({
     setIsLoadingUsers(true)
     try {
       const fetchedUsers = await getUsers()
-      setUsers(fetchedUsers as UserWithConfig[])
+      setUsers(fetchedUsers as User[])
     } catch (error) {
       console.error("Failed to load users:", error)
       toast.error("Error", {
