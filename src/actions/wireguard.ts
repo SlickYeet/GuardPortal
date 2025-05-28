@@ -205,38 +205,39 @@ export async function deletePeerConfig(id: string) {
     throw new Error("Peer config not found")
   }
 
-  // TODO: Get this working
-  const jobPayload = {
-    Job: {
-      JobID: `delete-peer-${configToDelete.name}:${id}`,
-      Configuration: configToDelete.configuration.name,
-      Peer: configToDelete.publicKey,
-      Field: "date",
-      Operator: "lgt",
-      Value: new Date().toISOString(),
-      CreationDate: "",
-      ExpireDate: "",
-      Action: "delete",
-    },
-  }
+  // const aLongLongTimeAgo = "2000-01-01 00:00:00"
 
-  const requestOptions: RequestInit = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
-    },
-    body: JSON.stringify(jobPayload),
-  }
+  // const jobPayload = {
+  //   Job: {
+  //     JobID: `delete-peer-${configToDelete.name}:${id}`,
+  //     Configuration: configToDelete.configuration.name,
+  //     Peer: configToDelete.publicKey,
+  //     Field: "date",
+  //     Operator: "lgt",
+  //     Value: aLongLongTimeAgo,
+  //     CreationDate: "",
+  //     ExpireDate: "",
+  //     Action: "delete",
+  //   },
+  // }
 
-  const response = await fetch(
-    `${env.WIREGUARD_API_ENDPOINT}/savePeerScheduleJob`,
-    requestOptions,
-  )
+  // const requestOptions: RequestInit = {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+  //   },
+  //   body: JSON.stringify(jobPayload),
+  // }
 
-  if (!response.ok) {
-    throw new Error(`Failed to delete peer config: ${response.statusText}`)
-  }
+  // const response = await fetch(
+  //   `${env.WIREGUARD_API_ENDPOINT}/savePeerScheduleJob`,
+  //   requestOptions,
+  // )
+
+  // if (!response.ok) {
+  //   throw new Error(`Failed to delete peer config: ${response.statusText}`)
+  // }
 
   await db.peerConfig.delete({
     where: { id },

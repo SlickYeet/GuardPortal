@@ -221,6 +221,9 @@ export function ConfigList() {
             <AlertDialogDescription>
               This will permanently delete the peer config and all its data.
               This action cannot be undone.
+              <br />
+              <span className="font-bold">Note: </span>Currently this does not
+              delete the peer from WireGuard.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
