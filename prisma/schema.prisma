@@ -95,13 +95,12 @@ model PeerConfig {
 }
 
 model Configuration {
-    id             String @id @default(cuid())
-    name           String
-    address        String
-    connectedPeers Int
-    listenPort     String
-    publicKey      String
-    privateKey     String
+    id         String @id @default(cuid())
+    name       String
+    address    String
+    listenPort String
+    publicKey  String
+    privateKey String
 
     PeerConfig PeerConfig[]
 }

@@ -59,7 +59,7 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
       await tx.peerConfig.create({
         data: {
           ...wireguardConfig,
-          name: `${validatedData.name}'s Config`,
+          name: validatedData.name,
           userId: user.id,
         },
       })

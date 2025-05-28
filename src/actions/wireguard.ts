@@ -164,7 +164,7 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
         "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
       },
       body: JSON.stringify({
-        name: `${name}'s Config`,
+        name,
         ...(ipAddress ? { allowed_ips: [ipAddress] } : {}),
         endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
       }),
@@ -192,20 +192,31 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
 export async function deletePeerConfig(id: string) {
   const configToDelete = await db.peerConfig.findUnique({
     where: { id },
+    select: {
+      name: true,
+      publicKey: true,
+      configuration: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   })
 
   if (!configToDelete) {
     throw new Error("Peer config not found")
   }
 
+  // TODO: Get this working
   const jobPayload = {
-    job: {
-      JobID: `delete-peer-${id}`,
-      Configuration: "",
-      Peer: "",
-      Field: "total_data",
+    Job: {
+      JobID: `delete-peer-${configToDelete.name}:${id}`,
+      Configuration: configToDelete.configuration.name,
+      Peer: configToDelete.publicKey,
+      Field: "date",
       Operator: "lgt",
-      Value: "0",
+      Value: new Date().toISOString(),
       CreationDate: "",
       ExpireDate: "",
       Action: "delete",
@@ -232,6 +243,9 @@ export async function deletePeerConfig(id: string) {
 
   await db.peerConfig.delete({
     where: { id },
+  })
+  await db.configuration.delete({
+    where: { id: configToDelete.configuration.id },
   })
 
   return {

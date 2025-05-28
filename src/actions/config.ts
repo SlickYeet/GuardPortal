@@ -15,7 +15,6 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
       values.ipAddress,
     )
     const wireguardConfig = wireguardConfigArr[0]
-    console.log("WireGuard config created:", wireguardConfig)
 
     const result = await db.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
@@ -42,7 +41,6 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
             create: {
               name: wireguardConfig.configuration.Name,
               address: wireguardConfig.configuration.Address,
-              connectedPeers: wireguardConfig.configuration.ConnectedPeers,
               listenPort: wireguardConfig.configuration.ListenPort,
               publicKey: wireguardConfig.configuration.PublicKey,
               privateKey: wireguardConfig.configuration.PrivateKey,
