@@ -2,7 +2,6 @@
 
 import { readFile } from "fs/promises"
 import path from "path"
-import { PeerConfig } from "@prisma/client"
 
 import { env } from "@/env"
 import { db } from "@/server/db"
@@ -19,11 +18,9 @@ export async function getDefaultPeerConfig() {
     return config
   } catch (error) {
     console.error("Error reading default peer config file:", error)
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Unknown error occurred",
-    }
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred",
+    )
   }
 }
 

@@ -26,7 +26,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { parsePeerConfig } from "@/lib/wireguard"
 import { UserWithConfig } from "@/types"
 
 export function UsersList() {
@@ -101,11 +100,6 @@ export function UsersList() {
     }
   }
 
-  function getIpAddress(config: string) {
-    const parsedConfig = parsePeerConfig(config)
-    return parsedConfig.allowedIPs || "N/A"
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -144,9 +138,7 @@ export function UsersList() {
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {user.config
-                      ? getIpAddress(user.config.config)
-                      : "No config"}
+                    {user.config ? user.config.allowedIPs : "No config"}
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end space-x-2">
