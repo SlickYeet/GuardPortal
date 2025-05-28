@@ -23,7 +23,6 @@
 # misc
 .DS_Store
 *.pem
-prisma/db.sqlite
 
 # debug
 npm-debug.log*

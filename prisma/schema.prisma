@@ -78,5 +78,5 @@ model PeerConfig {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     userId    String?  @unique
-    User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

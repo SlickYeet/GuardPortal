@@ -17,6 +17,7 @@ import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
 import { auth } from "@/server/auth"
 
+import { ConfigList } from "./_components/config-list"
 import { CreateUserForm } from "./_components/create-user-form"
 import { AdminTabs } from "./_components/tabs"
 import { UsersList } from "./_components/user-list"
@@ -103,9 +104,7 @@ export default async function AdminPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  This feature is under development.
-                </p>
+                <ConfigList />
               </CardContent>
             </Card>
           </TabsContent>

@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState, type ReactNode } from "react"
 
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const validTabs = [
@@ -47,12 +48,15 @@ export function AdminTabs({ children }: { children: ReactNode }) {
       defaultValue="create-user"
       className="space-y-6"
     >
-      <TabsList>
-        <TabsTrigger value="create-user">Create User</TabsTrigger>
-        <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
-        <TabsTrigger value="create-config">Create Config</TabsTrigger>
-        <TabsTrigger value="manage-configs">Manage Configs</TabsTrigger>
-      </TabsList>
+      <ScrollArea>
+        <TabsList>
+          <TabsTrigger value="create-user">Create User</TabsTrigger>
+          <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
+          <TabsTrigger value="create-config">Create Config</TabsTrigger>
+          <TabsTrigger value="manage-configs">Manage Configs</TabsTrigger>
+        </TabsList>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
 
       {children}
     </Tabs>

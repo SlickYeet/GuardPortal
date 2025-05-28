@@ -124,7 +124,8 @@ export function UsersList() {
         </div>
       ) : users.length === 0 ? (
         <div className="text-muted-foreground p-8 text-center">
-          No users found. Create a new user to get started.
+          <p>No users found.</p>
+          <p className="tex-sm">Create a new user to get started.</p>
         </div>
       ) : (
         <div className="rounded-md border">
@@ -194,21 +195,23 @@ export function UsersList() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteUser}
-              disabled={isDeleting}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
+            <div className="flex w-full justify-between">
+              <AlertDialogAction
+                disabled={isDeleting}
+                onClick={handleDeleteUser}
+                className="bg-destructive hover:bg-destructive/80"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete</span>
+                )}
+              </AlertDialogAction>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

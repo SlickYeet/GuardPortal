@@ -90,6 +90,7 @@ export async function getUsers() {
         id: true,
         name: true,
         email: true,
+        image: true,
         config: {
           select: {
             id: true,
