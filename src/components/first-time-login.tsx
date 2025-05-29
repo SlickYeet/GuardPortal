@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { updateUserPassword } from "@/actions/user"
+import { updateUserPasswordAndVerifyEmail } from "@/actions/user"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -45,7 +45,7 @@ export function FirstTimeLogin({ user }: FirstTimeLoginProps) {
   async function handleSubmit(values: z.infer<typeof FirstTimeLoginSchema>) {
     try {
       const validatedData = FirstTimeLoginSchema.parse(values)
-      const res = await updateUserPassword(validatedData)
+      const res = await updateUserPasswordAndVerifyEmail(validatedData)
       if (!res.success) {
         toast.error(res.message || "Failed to update password.")
         return

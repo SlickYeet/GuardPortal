@@ -1,6 +1,14 @@
 "use client"
 
-import { Copy, Key, Loader2, RefreshCcw, Trash2 } from "lucide-react"
+import {
+  CheckCircle,
+  Copy,
+  Key,
+  Loader2,
+  RefreshCcw,
+  Trash2,
+  XCircle,
+} from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -129,7 +137,9 @@ export function UsersList() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>IP Address</TableHead>
-                <TableHead />
+                <TableHead className="text-center">Updated Password</TableHead>
+                <TableHead className="text-center">Verified Email</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -139,6 +149,24 @@ export function UsersList() {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     {user.config ? user.config.allowedIPs : "No config"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-center">
+                      {user.emailVerified ? (
+                        <CheckCircle className="size-4 text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <XCircle className="text-destructive size-4" />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-center">
+                      {!user.isFirstLogin ? (
+                        <CheckCircle className="size-4 text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <XCircle className="text-destructive size-4" />
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end space-x-2">

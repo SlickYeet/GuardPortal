@@ -111,6 +111,8 @@ export async function getUsers() {
         name: true,
         email: true,
         image: true,
+        emailVerified: true,
+        isFirstLogin: true,
         config: {
           select: {
             id: true,
@@ -255,7 +257,7 @@ export async function resetUserPassword(userId: string) {
   }
 }
 
-export async function updateUserPassword(
+export async function updateUserPasswordAndVerifyEmail(
   values: z.infer<typeof FirstTimeLoginSchema>,
 ) {
   try {
@@ -298,6 +300,7 @@ export async function updateUserPassword(
       await db.user.update({
         where: { id: user.id },
         data: {
+          emailVerified: true,
           isFirstLogin: false,
           accounts: {
             update: {
