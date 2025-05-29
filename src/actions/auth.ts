@@ -37,6 +37,7 @@ export async function createFirstUserAsAdmin(
     where: { email },
     data: {
       emailVerified: true,
+      isFirstLogin: false,
     },
   })
 
@@ -100,4 +101,13 @@ export async function signOut() {
   }
 
   return redirect("/")
+}
+
+export async function isUserFirstLogin(userId: string) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { isFirstLogin: true },
+  })
+
+  return user?.isFirstLogin ?? false
 }

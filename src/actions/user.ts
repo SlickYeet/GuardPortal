@@ -1,11 +1,13 @@
 "use server"
 
 import { hash } from "bcryptjs"
+import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
 import { sendEmail } from "@/actions/email"
 import { addPeerConfig, deletePeerConfig } from "@/actions/wireguard"
 import { generateTemporaryPassword } from "@/lib/password"
+import { FirstTimeLoginSchema } from "@/schemas/auth"
 import { UserSchema } from "@/schemas/user"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
@@ -29,7 +31,6 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
     const tempPassword = generateTemporaryPassword()
     const hashedPassword = await hash(tempPassword, 12)
 
-    // TODO: prevent the admin from being logged out after creating a new user
     const newUser = await auth.api.createUser({
       body: {
         name: validatedData.name,
@@ -203,17 +204,42 @@ export async function resetUserPassword(userId: string) {
     const tempPassword = generateTemporaryPassword()
     const hashedPassword = await hash(tempPassword, 12)
 
-    const accounts = await db.account.findMany({
-      where: { userId },
-      select: { id: true },
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        accounts: {
+          select: {
+            id: true,
+            providerId: true,
+          },
+        },
+      },
     })
 
-    for (const account of accounts) {
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found.",
+      }
+    }
+
+    for (const account of user.accounts) {
       await db.account.update({
         where: { id: account.id, providerId: "credential" },
         data: { password: hashedPassword },
       })
     }
+
+    await sendEmail({
+      to: user.email,
+      subject: "Your HHN VPN Account Credentials",
+      template: "new-user",
+      data: {
+        email: user.email,
+        password: hashedPassword,
+      },
+    })
 
     return {
       success: true,
@@ -221,6 +247,84 @@ export async function resetUserPassword(userId: string) {
     }
   } catch (error) {
     console.error("Error resetting user password:", error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred.",
+    }
+  }
+}
+
+export async function updateUserPassword(
+  values: z.infer<typeof FirstTimeLoginSchema>,
+) {
+  try {
+    const validatedData = FirstTimeLoginSchema.parse(values)
+    const hashedPassword = await hash(validatedData.password, 12)
+
+    const user = await db.user.findUnique({
+      where: {
+        email: validatedData.email,
+      },
+      select: {
+        id: true,
+        accounts: {
+          select: {
+            id: true,
+            password: true,
+          },
+        },
+      },
+    })
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found.",
+      }
+    }
+
+    let passwordUpdated = false
+
+    for (const account of user.accounts) {
+      if (!account.password) {
+        return {
+          success: false,
+          message:
+            "User account does not have a password set. Please use the first-time login flow.",
+        }
+      }
+
+      await db.user.update({
+        where: { id: user.id },
+        data: {
+          isFirstLogin: false,
+          accounts: {
+            update: {
+              where: { id: account.id },
+              data: { password: hashedPassword },
+            },
+          },
+        },
+      })
+
+      passwordUpdated = true
+    }
+
+    if (!passwordUpdated) {
+      return {
+        success: false,
+        message: "Failed to update user password.",
+      }
+    }
+
+    revalidatePath("/vpn")
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error("Error updating user password:", error)
     return {
       success: false,
       message:

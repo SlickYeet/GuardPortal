@@ -17,6 +17,7 @@ model User {
     banned        Boolean?
     banReason     String?
     banExpires    DateTime?
+    isFirstLogin  Boolean?    @default(true)
     createdAt     DateTime
     updatedAt     DateTime
     sessions      Session[]

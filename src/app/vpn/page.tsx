@@ -12,8 +12,10 @@ import { type Metadata } from "next"
 import { headers } from "next/headers"
 import Link from "next/link"
 
+import { isUserFirstLogin } from "@/actions/auth"
 import { getPeerConfigByUserId } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
+import { FirstTimeLogin } from "@/components/first-time-login"
 import { QRCodeDisplay } from "@/components/qr-code-display"
 import { Button } from "@/components/ui/button"
 import {
@@ -66,9 +68,30 @@ export default async function VPNPage() {
   })
   const user = session?.user
 
-  const isAdmin = isUserAdmin(session?.user)
+  if (!user) {
+    return (
+      <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <h1 className="text-primary text-3xl font-bold">
+            How did you get here?
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            This is not supposed to be possible. Please log in to access your
+            VPN configuration.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-  const wireguardConfig = await getPeerConfigByUserId(user!.id)
+  const isAdmin = isUserAdmin(session.user)
+  const isFirstLogin = await isUserFirstLogin(user.id)
+
+  if (isFirstLogin) {
+    return <FirstTimeLogin user={user} />
+  }
+
+  const wireguardConfig = await getPeerConfigByUserId(user.id)
 
   if (!wireguardConfig) {
     return (
