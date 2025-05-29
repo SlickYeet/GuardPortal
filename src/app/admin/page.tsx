@@ -27,13 +27,13 @@ export default async function AdminPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
+  const currentUser = session?.user
 
-  const isAdmin = isUserAdmin(session?.user)
+  const isAdmin = isUserAdmin(currentUser)
 
-  if (!session?.session || !session?.user || !isAdmin) {
+  if (!session?.session || !currentUser || !isAdmin) {
     return redirect("/")
   }
-
   const defaultConfig = await getDefaultPeerConfig()
 
   return (
@@ -41,7 +41,7 @@ export default async function AdminPage() {
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="mb-6 text-3xl font-bold">VPN Admin Dashboard</h1>
-          <UserMenu user={session.user} isAdmin={isAdmin} />
+          <UserMenu user={currentUser} isAdmin={isAdmin} />
         </div>
 
         <AdminTabs>
@@ -74,7 +74,7 @@ export default async function AdminPage() {
               </CardHeader>
               <CardContent>
                 <Suspense fallback={<UsersListSkeleton />}>
-                  <UsersList />
+                  <UsersList currentUser={currentUser} />
                 </Suspense>
               </CardContent>
             </Card>

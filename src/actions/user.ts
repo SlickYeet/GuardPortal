@@ -174,7 +174,6 @@ export async function deleteUser(userId: string) {
       }
     }
 
-    // TODO: Not working
     const deletedConfig = await deletePeerConfig(existingUser.config.id)
 
     if (!deletedConfig) {

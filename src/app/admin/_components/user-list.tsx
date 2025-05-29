@@ -1,5 +1,6 @@
 "use client"
 
+import { type User } from "better-auth"
 import {
   CheckCircle,
   Copy,
@@ -36,7 +37,7 @@ import {
 import { cn } from "@/lib/utils"
 import { UserWithConfig } from "@/types"
 
-export function UsersList() {
+export function UsersList({ currentUser }: { currentUser: User }) {
   const [users, setUsers] = useState<UserWithConfig[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [userToDelete, setUserToDelete] = useState<string | null>(null)
@@ -173,6 +174,7 @@ export function UsersList() {
                       <Hint label="Reset Password" asChild>
                         <Button
                           disabled={isResetting === user.id}
+                          // TODO: Add confirmation dialog
                           onClick={() => handleResetPassword(user.id)}
                           size="icon"
                           variant="outline"
@@ -186,6 +188,7 @@ export function UsersList() {
                       </Hint>
                       <Hint label="Delete User" asChild>
                         <Button
+                          disabled={currentUser.id === user.id || isDeleting}
                           onClick={() => setUserToDelete(user.id)}
                           size="icon"
                           variant="destructive"
