@@ -169,14 +169,16 @@ export default async function VPNPage() {
                     Your WireGuard configuration details
                   </CardDescription>
                 </div>
-                <Button size="icon" variant="outline" asChild>
-                  <Link
-                    href={`/admin?tab=manage-configs&id=${wireguardConfig.id}`}
-                  >
-                    <Edit className="size-4" />
-                    <span className="sr-only">Edit Configuration</span>
-                  </Link>
-                </Button>
+                {isAdmin && (
+                  <Button size="icon" variant="outline" asChild>
+                    <Link
+                      href={`/admin?tab=manage-configs&id=${wireguardConfig.id}`}
+                    >
+                      <Edit className="size-4" />
+                      <span className="sr-only">Edit Configuration</span>
+                    </Link>
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent className="flex h-full flex-col justify-between space-y-4">
