@@ -265,8 +265,8 @@ export async function addPeerConfig(
     }
 
     const json = await response.json()
-    console.log("Peer config added successfully:", json.data)
     const peer = Array.isArray(json.data) ? json.data[0] : json.data
+
     return {
       name: configName,
       userId: userId,

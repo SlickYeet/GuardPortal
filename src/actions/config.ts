@@ -10,11 +10,11 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
   try {
     const validatedData = ConfigSchema.parse(values)
 
-    const wireguardConfigArr = await addPeerConfig(
+    const wireguardConfig = await addPeerConfig(
       values.name,
+      values.userId,
       values.ipAddress,
     )
-    const wireguardConfig = wireguardConfigArr[0]
 
     const result = await db.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
@@ -28,22 +28,22 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
       const config = await tx.peerConfig.create({
         data: {
           name: validatedData.name,
-          publicKey: wireguardConfig.id,
-          privateKey: wireguardConfig.private_key,
-          allowedIPs: wireguardConfig.allowed_ip,
-          endpoint: wireguardConfig.remote_endpoint,
-          endpointAllowedIP: wireguardConfig.endpoint_allowed_ip,
-          dns: wireguardConfig.DNS,
-          preSharedKey: wireguardConfig.preshared_key,
+          publicKey: wireguardConfig.publicKey,
+          privateKey: wireguardConfig.privateKey,
+          allowedIPs: wireguardConfig.allowedIPs,
+          endpoint: wireguardConfig.endpoint,
+          endpointAllowedIP: wireguardConfig.endpointAllowedIP,
+          dns: wireguardConfig.dns,
+          preSharedKey: wireguardConfig.preSharedKey,
           mtu: wireguardConfig.mtu,
-          keepAlive: wireguardConfig.keepalive,
+          keepAlive: wireguardConfig.keepAlive,
           configuration: {
             create: {
-              name: wireguardConfig.configuration.Name,
-              address: wireguardConfig.configuration.Address,
-              listenPort: wireguardConfig.configuration.ListenPort,
-              publicKey: wireguardConfig.configuration.PublicKey,
-              privateKey: wireguardConfig.configuration.PrivateKey,
+              name: wireguardConfig.configuration.name,
+              address: wireguardConfig.configuration.address,
+              listenPort: wireguardConfig.configuration.listenPort,
+              publicKey: wireguardConfig.configuration.publicKey,
+              privateKey: wireguardConfig.configuration.privateKey,
             },
           },
           user: {
