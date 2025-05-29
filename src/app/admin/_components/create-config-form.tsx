@@ -112,7 +112,6 @@ export function CreateConfigForm({
           description: `Config name: ${result.name}`,
         })
         form.reset()
-        // Refresh available IPs after creating a config
         loadAvailableIps()
       } else {
         toast.error("Error", {

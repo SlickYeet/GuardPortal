@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { requestAccessEmail } from "@/actions/email"
+import { requestAccessEmail } from "@/actions/access-requests"
 import { Button } from "@/components/ui/button"
 import {
   Card,

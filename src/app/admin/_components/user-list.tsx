@@ -146,7 +146,7 @@ export function UsersList() {
                         <Button
                           disabled={isResetting === user.id}
                           onClick={() => handleResetPassword(user.id)}
-                          size="sm"
+                          size="icon"
                           variant="outline"
                         >
                           {isResetting === user.id ? (
@@ -159,7 +159,7 @@ export function UsersList() {
                       <Hint label="Delete User" asChild>
                         <Button
                           onClick={() => setUserToDelete(user.id)}
-                          size="sm"
+                          size="icon"
                           variant="destructive"
                         >
                           <Trash2 className="size-4" />

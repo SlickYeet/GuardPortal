@@ -11,6 +11,7 @@ const validTabs = [
   "create-config",
   "manage-users",
   "manage-configs",
+  "access-requests",
 ] as const
 type TabValue = (typeof validTabs)[number]
 
@@ -54,6 +55,7 @@ export function AdminTabs({ children }: { children: ReactNode }) {
           <TabsTrigger value="manage-users">Manage Users</TabsTrigger>
           <TabsTrigger value="create-config">Create Config</TabsTrigger>
           <TabsTrigger value="manage-configs">Manage Configs</TabsTrigger>
+          <TabsTrigger value="access-requests">Access Requests</TabsTrigger>
         </TabsList>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>

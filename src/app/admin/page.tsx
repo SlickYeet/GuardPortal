@@ -17,6 +17,7 @@ import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
 import { auth } from "@/server/auth"
 
+import { AccessRequestList } from "./_components/access-request-list"
 import { ConfigList } from "./_components/config-list"
 import { CreateUserForm } from "./_components/create-user-form"
 import { AdminTabs } from "./_components/tabs"
@@ -105,6 +106,20 @@ export default async function AdminPage() {
               </CardHeader>
               <CardContent>
                 <ConfigList defaultConfig={defaultConfig} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="access-requests">
+            <Card>
+              <CardHeader>
+                <CardTitle>Access Requests</CardTitle>
+                <CardDescription>
+                  Manage access requests from users
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AccessRequestList />
               </CardContent>
             </Card>
           </TabsContent>

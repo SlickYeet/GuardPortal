@@ -68,7 +68,6 @@ export function CreateUserForm() {
           description: `Temporary password: ${result.tempPassword}`,
         })
         reset()
-        // Refresh available IPs after creating a user
         loadAvailableIps()
       } else {
         toast.error("Error", {

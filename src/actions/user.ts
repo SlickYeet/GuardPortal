@@ -3,7 +3,7 @@
 import { hash } from "bcryptjs"
 import { z } from "zod"
 
-import { addPeerConfig } from "@/actions/wireguard"
+import { addPeerConfig, deletePeerConfig } from "@/actions/wireguard"
 import { generateTemporaryPassword } from "@/lib/password"
 import { UserSchema } from "@/schemas/user"
 import { auth } from "@/server/auth"
@@ -128,6 +128,14 @@ export async function deleteUser(userId: string) {
   try {
     const deletedUser = await db.user.delete({
       where: { id: userId },
+      select: {
+        id: true,
+        config: {
+          select: {
+            id: true,
+          },
+        },
+      },
     })
 
     if (!deletedUser) {
@@ -136,8 +144,21 @@ export async function deleteUser(userId: string) {
         message: "User not found.",
       }
     }
+    if (!deletedUser.config) {
+      return {
+        success: false,
+        message: "User has no associated WireGuard configuration.",
+      }
+    }
 
-    // TODO: Delete associated peer config on wg
+    const deletedConfig = await deletePeerConfig(deletedUser.config.id)
+
+    if (!deletedConfig) {
+      return {
+        success: false,
+        message: "Failed to delete WireGuard configuration.",
+      }
+    }
 
     return {
       success: true,
