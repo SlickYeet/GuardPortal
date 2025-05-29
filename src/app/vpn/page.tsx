@@ -1,5 +1,6 @@
 import {
   CloudCog,
+  Edit,
   FileText,
   Globe,
   QrCode,
@@ -14,6 +15,7 @@ import Link from "next/link"
 import { getPeerConfigByUserId } from "@/actions/wireguard"
 import { DetailsCardButtons } from "@/app/vpn/_components/details-card-buttons"
 import { QRCodeDisplay } from "@/components/qr-code-display"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -134,13 +136,25 @@ export default async function VPNPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>
-                <Settings2 className="mr-2 inline-block size-4" />
-                Configuration Details
-              </CardTitle>
-              <CardDescription>
-                Your WireGuard configuration details
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>
+                    <Settings2 className="mr-2 inline-block size-4" />
+                    Configuration Details
+                  </CardTitle>
+                  <CardDescription>
+                    Your WireGuard configuration details
+                  </CardDescription>
+                </div>
+                <Button size="icon" variant="outline" asChild>
+                  <Link
+                    href={`/admin?tab=manage-configs&id=${wireguardConfig.id}`}
+                  >
+                    <Edit className="size-4" />
+                    <span className="sr-only">Edit Configuration</span>
+                  </Link>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="flex h-full flex-col justify-between space-y-4">
               {CONFIG_DETAILS.map(({ label, value, icon: Icon }) => (

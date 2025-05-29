@@ -139,7 +139,10 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
                   <TableCell className="truncate font-medium">
                     {config.name || "Unnamed Peer"}
                   </TableCell>
-                  <TableCell>{`${config.endpoint}` || "N/A"}</TableCell>
+                  <TableCell>
+                    {`${config.endpoint}:${config.configuration.listenPort}` ||
+                      "N/A"}
+                  </TableCell>
                   <TableCell>{config.allowedIPs || "N/A"}</TableCell>
                   <TableCell>{config.dns || "N/A"}</TableCell>
                   {config.user ? (
