@@ -1,13 +1,20 @@
 "use client"
 
-import { type PeerConfig } from "@prisma/client"
 import { CheckCircle, Copy, CopyCheck, Download } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import {
+  peerConfigToWgConfig,
+  type PeerConfigWithConfiguration,
+} from "@/lib/wireguard"
 
-export function DetailsCardButtons({ config }: { config: PeerConfig }) {
+export function DetailsCardButtons({
+  config,
+}: {
+  config: PeerConfigWithConfiguration
+}) {
   const [state, setState] = useState({
     error: {
       download: "",
@@ -17,7 +24,7 @@ export function DetailsCardButtons({ config }: { config: PeerConfig }) {
     copied: false,
   })
 
-  const configString = JSON.stringify(config)
+  const configString = peerConfigToWgConfig(config)
 
   const downloadConfig = () => {
     try {

@@ -28,7 +28,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
-import type { PeerConfigWithConfiguration } from "@/lib/wireguard"
 import { auth } from "@/server/auth"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -151,9 +150,7 @@ export default async function VPNPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <QRCodeDisplay
-                config={wireguardConfig as PeerConfigWithConfiguration}
-              />
+              <QRCodeDisplay config={wireguardConfig} />
             </CardContent>
           </Card>
 
