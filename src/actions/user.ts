@@ -3,6 +3,7 @@
 import { hash } from "bcryptjs"
 import { z } from "zod"
 
+import { sendEmail } from "@/actions/email"
 import { addPeerConfig, deletePeerConfig } from "@/actions/wireguard"
 import { generateTemporaryPassword } from "@/lib/password"
 import { UserSchema } from "@/schemas/user"
@@ -44,21 +45,19 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
       }
     }
 
-    const user = await db.user.findUnique({
-      where: { email: validatedData.email },
-      select: { id: true, name: true },
+    await sendEmail({
+      to: validatedData.email,
+      subject: "Your HHN VPN Account Credentials",
+      template: "new-user",
+      data: {
+        email: validatedData.email,
+        password: hashedPassword,
+      },
     })
-
-    if (!user) {
-      return {
-        success: false,
-        message: "User not found after creation.",
-      }
-    }
 
     const wireguardConfig = await addPeerConfig(
       validatedData.name,
-      user.id,
+      newUser.user.id,
       validatedData.ipAddress,
     )
 
@@ -82,7 +81,7 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
         },
         user: {
           connect: {
-            id: user.id,
+            id: newUser.user.id,
           },
         },
       },
@@ -90,7 +89,7 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
 
     return {
       success: true,
-      userId: user.id,
+      userId: newUser.user.id,
       tempPassword,
     }
   } catch (error) {

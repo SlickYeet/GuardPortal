@@ -2,8 +2,10 @@ import { AccessRequestStatus } from "@prisma/client"
 import { render } from "@react-email/components"
 
 import { AccessRequestEmail } from "@/components/emails/access-request"
+import { env } from "@/env"
 
 export type EmailTemplates =
+  | "new-user"
   | "request-access"
   | "access-request-pending"
   | "access-request-approved"
@@ -13,6 +15,22 @@ const emails: Record<
   EmailTemplates,
   React.ComponentType<{ data: Record<string, string> }>
 > = {
+  "new-user": (props) => {
+    const { data } = props
+    return (
+      <div>
+        <h1>Welcome to HHN VPN</h1>
+        <p>Email: {data.email}</p>
+        <p>Password: {data.password}</p>
+        <p>Your account has been created successfully!</p>
+        <p>
+          Click
+          <a href={env.NEXT_PUBLIC_URL}> here</a>
+          to log in to your account
+        </p>
+      </div>
+    )
+  },
   "request-access": (props) => {
     const { data } = props
     return (
