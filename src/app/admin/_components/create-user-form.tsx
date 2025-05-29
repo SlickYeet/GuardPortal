@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Plus, RefreshCw } from "lucide-react"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { UserSchema } from "@/schemas/user"
 
 export function CreateUserForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const name = searchParams.get("name") || ""
   const email = searchParams.get("email") || ""
@@ -78,6 +79,7 @@ export function CreateUserForm() {
           description: `Temporary password: ${result.tempPassword}`,
         })
         reset()
+        router.push("/admin?tab=create-user")
         loadAvailableIps()
       } else {
         toast.error("Error", {
