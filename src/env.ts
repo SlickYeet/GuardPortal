@@ -16,6 +16,8 @@ export const env = createEnv({
     WIREGUARD_API_KEY: z.string(),
     WIREGUARD_VPN_ENDPOINT: z.string(),
     WIREGUARD_VPN_PORT: z.string(),
+    RESEND_API_KEY: z.string(),
+    REDIS_URL: z.string(),
     ADMIN_NAME: z.string(),
     ADMIN_EMAIL: z.string().email(),
     ADMIN_PASSWORD: z
@@ -31,6 +33,7 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_URL: z.string().url(),
+    NEXT_PUBLIC_CONTACT_EMAIL: z.string().email(),
   },
 
   /**
@@ -46,6 +49,9 @@ export const env = createEnv({
     WIREGUARD_API_KEY: process.env.WIREGUARD_API_KEY,
     WIREGUARD_VPN_ENDPOINT: process.env.WIREGUARD_VPN_ENDPOINT,
     WIREGUARD_VPN_PORT: process.env.WIREGUARD_VPN_PORT,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    REDIS_URL: process.env.REDIS_URL,
+    NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     ADMIN_NAME: process.env.ADMIN_NAME,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,

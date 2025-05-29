@@ -1,4 +1,4 @@
-import { Loader2, Trash2, XCircle } from "lucide-react"
+import { Loader2, Trash2 } from "lucide-react"
 
 import { Hint } from "@/components/hint"
 import {

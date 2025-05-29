@@ -1,13 +1,13 @@
 "use client"
 
-import { Edit, Loader2, RefreshCw, Save, XCircle } from "lucide-react"
+import { Edit, Loader2, RefreshCw, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
 import { getUsers } from "@/actions/user"
-import { getAvailablePeerIPs, getPeerConfigById } from "@/actions/wireguard"
+import { getAvailablePeerIPs } from "@/actions/wireguard"
 import { Hint } from "@/components/hint"
 import {
   Accordion,
@@ -36,7 +36,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
   SelectContent,

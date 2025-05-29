@@ -92,7 +92,6 @@ export async function getPeerConfigByUserId(userId: string) {
     if (!user || !user.config) {
       return null
     }
-    ;``
 
     return user.config
   } catch (error) {

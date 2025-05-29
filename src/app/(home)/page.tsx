@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 import { db } from "@/server/db"
 
@@ -9,20 +10,26 @@ export default async function HomePage() {
   const userCount = await db.user.count()
 
   return (
-    <div className="flex min-h-screen items-center justify-center py-12 md:-mt-20 md:py-0">
+    <div className="flex min-h-screen items-center justify-center py-12 md:-mt-12 md:py-0">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <span className="text-muted-foreground text-sm tracking-wide">
             Powered by{" "}
           </span>
-          <Image
-            src="/wireguard.svg"
-            alt="wireguard logo"
-            width={120}
-            height={60}
-            className="mx-auto mb-4 h-20 w-auto"
-          />
-          <h2 className="text-primary my-6 text-center text-3xl font-extrabold">
+          <a
+            href="https://wireguard.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              src="/wireguard.svg"
+              alt="wireguard logo"
+              width={120}
+              height={60}
+              className="mx-auto mb-4 h-20 w-auto"
+            />
+          </a>
+          <h1 className="text-primary my-6 text-center text-3xl font-extrabold">
             {userCount > 0 ? (
               "Sign in to HHN VPN"
             ) : (
@@ -37,9 +44,25 @@ export default async function HomePage() {
                 </span>
               </>
             )}
-          </h2>
+          </h1>
         </div>
-        {userCount > 0 && <SignInForm />}
+        {userCount > 0 && (
+          <>
+            <SignInForm />
+            <div className="text-muted-foreground text-center text-sm">
+              <p>
+                To request access, please fill out the{" "}
+                <Link
+                  href="/request-access"
+                  className="text-primary hover:text-primary/80 underline underline-offset-2"
+                >
+                  access request form
+                </Link>
+                .
+              </p>
+            </div>
+          </>
+        )}
         {userCount === 0 && <CreateFirstUser />}
       </div>
     </div>
