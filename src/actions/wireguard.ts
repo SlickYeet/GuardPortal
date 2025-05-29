@@ -367,7 +367,7 @@ export async function updatePeerConfig(
     body: JSON.stringify({
       id: rawConfig.PublicKey || existingConfig.publicKey,
       DNS: rawConfig.DNS || existingConfig.dns,
-      allowed_ips: Array.isArray(rawConfig.AllowedIPs)
+      allowed_ip: Array.isArray(rawConfig.AllowedIPs)
         ? rawConfig.AllowedIPs
         : Array.isArray(rawConfig.AllowedIPs) && rawConfig.AllowedIPs.length > 0
           ? rawConfig.AllowedIPs
