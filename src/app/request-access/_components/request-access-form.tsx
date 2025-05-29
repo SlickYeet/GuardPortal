@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { requestAccessEmail } from "@/actions/access-requests"
+import { createRequestAccess } from "@/actions/access-requests"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -45,7 +45,7 @@ export function RequestAccessForm() {
   })
 
   const onSubmit = async (values: z.infer<typeof RequestAccessSchema>) => {
-    const response = await requestAccessEmail(values)
+    const response = await createRequestAccess(values)
 
     if (!response.success) {
       console.error("Failed to send email:", response.message)

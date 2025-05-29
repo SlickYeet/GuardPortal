@@ -1,16 +1,18 @@
 "use server"
 
+import { headers } from "next/headers"
 import { z } from "zod"
 
 import { sendEmail } from "@/actions/email"
 import { env } from "@/env"
+import { rateLimiter } from "@/lib/ratelimit"
 import {
   RequestAccessSchema,
   UpdateAccessRequestSchema,
 } from "@/schemas/request-access"
 import { db } from "@/server/db"
 
-export async function requestAccessEmail(
+export async function createRequestAccess(
   values: z.infer<typeof RequestAccessSchema>,
 ): Promise<{
   success: boolean
@@ -18,6 +20,23 @@ export async function requestAccessEmail(
   data?: Record<string, string>
 }> {
   try {
+    const ip = ((await headers()).get("x-forwarded-for") ?? "127.0.0.1")
+      .split(",")[0]
+      .trim()
+    const { success, remaining } = await rateLimiter({
+      ip,
+      limit: 1,
+      duration: 60 * 1000 * 5, // 5 minutes
+    })
+    if (!success) {
+      return {
+        success: false,
+        message: `Rate limit exceeded. Try again in ${Math.ceil(
+          remaining / 1000,
+        )} seconds.`,
+      }
+    }
+
     const existingAccessRequest = await db.accessRequest.count({
       where: { email: values.email },
     })
