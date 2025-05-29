@@ -1,7 +1,7 @@
 "use client"
 
 import { AccessRequest } from "@prisma/client"
-import { format, set } from "date-fns"
+import { format } from "date-fns"
 import { Loader2, RefreshCcw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
