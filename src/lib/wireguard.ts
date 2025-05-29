@@ -1,3 +1,5 @@
+import { Configuration, PeerConfig } from "@prisma/client"
+
 export function parsePeerConfig(config: string) {
   function parseSection(section: string): Record<string, string> {
     const result: Record<string, string> = {}
@@ -21,4 +23,26 @@ export function parsePeerConfig(config: string) {
   }
 
   return configObj
+}
+
+export type PeerConfigWithConfiguration = PeerConfig & {
+  configuration: Configuration
+}
+
+export function peerConfigToWgConfig(
+  config: PeerConfigWithConfiguration,
+): string {
+  return `[Interface]
+PrivateKey = ${config.privateKey}
+Address = ${config.allowedIPs}
+MTU = ${config.mtu}
+DNS = ${config.dns}
+
+[Peer]
+PublicKey = ${config.configuration?.publicKey}
+AllowedIPs = ${config.endpointAllowedIP}
+Endpoint = ${config.endpoint}
+PersistentKeepalive = ${config.keepAlive}
+${config.preSharedKey ? `PresharedKey = ${config.preSharedKey}` : ""}
+`
 }

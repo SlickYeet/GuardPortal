@@ -80,12 +80,19 @@ export async function getPeerConfigByUserId(userId: string) {
   try {
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { email: true, config: true },
+      select: {
+        config: {
+          include: {
+            configuration: true,
+          },
+        },
+      },
     })
 
     if (!user || !user.config) {
       return null
     }
+    ;``
 
     return user.config
   } catch (error) {
@@ -307,7 +314,6 @@ export async function deletePeerConfig(id: string) {
 export async function updatePeerConfig(
   values: Partial<z.infer<typeof ConfigUpdateSchema>>,
 ) {
-  console.log({ values })
   const session = await auth.api.getSession({
     headers: await headers(),
   })

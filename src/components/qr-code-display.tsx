@@ -1,12 +1,15 @@
 "use client"
 
-import { type PeerConfig } from "@prisma/client"
 import QRCode from "react-qr-code"
 
 import { useIsMobile } from "@/hooks/use-mobile"
+import {
+  peerConfigToWgConfig,
+  type PeerConfigWithConfiguration,
+} from "@/lib/wireguard"
 
 interface QRCodeDisplayProps {
-  config: PeerConfig
+  config: PeerConfigWithConfiguration
   size?: number
 }
 
@@ -16,7 +19,7 @@ export function QRCodeDisplay({ config, size = 256 }: QRCodeDisplayProps) {
     size = 200
   }
 
-  const configString = JSON.stringify(config)
+  const configString = peerConfigToWgConfig(config)
 
   return (
     <div className="flex justify-center">
