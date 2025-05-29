@@ -112,6 +112,7 @@ export async function getAvailablePeerIPs() {
       redirect: "follow",
     }
 
+    // TODO: Require interface to be passed in
     const response = await fetch(
       `${env.WIREGUARD_API_ENDPOINT}/getAvailableIPs/wg0`,
       requestOptions,
@@ -145,6 +146,7 @@ export async function getPeerConfigs() {
       redirect: "follow",
     }
 
+    // TODO: Require interface to be passed in
     const response = await fetch(
       `${env.WIREGUARD_API_ENDPOINT}/downloadAllPeers/wg0`,
       requestOptions,
@@ -212,6 +214,24 @@ export async function getPeerConfigsFromDB() {
 
 export async function addPeerConfig(name: string, ipAddress?: string) {
   try {
+    const existingConfig = await db.peerConfig.findFirst({
+      where: { name, allowedIPs: ipAddress || undefined },
+      select: {
+        id: true,
+        configuration: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    if (existingConfig) {
+      throw new Error(
+        `A peer config with the name "${name}" and IP "${ipAddress}" already exists.`,
+      )
+    }
+
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
@@ -225,6 +245,7 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
       }),
     }
 
+    // TODO: Add interface to add peer form
     const response = await fetch(
       `${env.WIREGUARD_API_ENDPOINT}/addPeers/wg0`,
       requestOptions,
@@ -248,7 +269,6 @@ export async function deletePeerConfig(id: string) {
   const configToDelete = await db.peerConfig.findUnique({
     where: { id },
     select: {
-      name: true,
       publicKey: true,
       configuration: {
         select: {
@@ -263,39 +283,25 @@ export async function deletePeerConfig(id: string) {
     throw new Error("Peer config not found")
   }
 
-  // const aLongLongTimeAgo = "2000-01-01 00:00:00"
+  const requestOptions: RequestInit = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+    },
+    body: JSON.stringify({
+      peers: [configToDelete.publicKey],
+    }),
+  }
 
-  // const jobPayload = {
-  //   Job: {
-  //     JobID: `delete-peer-${configToDelete.name}:${id}`,
-  //     Configuration: configToDelete.configuration.name,
-  //     Peer: configToDelete.publicKey,
-  //     Field: "date",
-  //     Operator: "lgt",
-  //     Value: aLongLongTimeAgo,
-  //     CreationDate: "",
-  //     ExpireDate: "",
-  //     Action: "delete",
-  //   },
-  // }
+  const response = await fetch(
+    `${env.WIREGUARD_API_ENDPOINT}/deletePeers/${configToDelete.configuration.name}`,
+    requestOptions,
+  )
 
-  // const requestOptions: RequestInit = {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
-  //   },
-  //   body: JSON.stringify(jobPayload),
-  // }
-
-  // const response = await fetch(
-  //   `${env.WIREGUARD_API_ENDPOINT}/savePeerScheduleJob`,
-  //   requestOptions,
-  // )
-
-  // if (!response.ok) {
-  //   throw new Error(`Failed to delete peer config: ${response.statusText}`)
-  // }
+  if (!response.ok) {
+    throw new Error(`Failed to delete peer config: ${response.statusText}`)
+  }
 
   await db.peerConfig.delete({
     where: { id },
@@ -324,32 +330,99 @@ export async function updatePeerConfig(
     throw new Error("The config ID and userId must be provided to update")
   }
 
+  const existingConfig = await db.peerConfig.findUnique({
+    where: { id, userId: userId || undefined },
+    select: {
+      name: true,
+      publicKey: true,
+      dns: true,
+      allowedIPs: true,
+      endpointAllowedIP: true,
+      keepAlive: true,
+      mtu: true,
+      privateKey: true,
+      endpoint: true,
+      preSharedKey: true,
+      configuration: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  })
+
+  if (!existingConfig) {
+    throw new Error("Peer config not found")
+  }
+
   const parseContent = z.string().parse(content)
   const rawConfig = parsePeerConfig(parseContent)
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+    },
+    body: JSON.stringify({
+      id: rawConfig.PublicKey || existingConfig.publicKey,
+      DNS: rawConfig.DNS || existingConfig.dns,
+      allowed_ips: Array.isArray(rawConfig.AllowedIPs)
+        ? rawConfig.AllowedIPs
+        : Array.isArray(rawConfig.AllowedIPs) && rawConfig.AllowedIPs.length > 0
+          ? rawConfig.AllowedIPs
+          : existingConfig.allowedIPs,
+      endpoint_allowed_ip:
+        rawConfig.Address || existingConfig.endpointAllowedIP,
+      keepalive: rawConfig.PersistentKeepalive || existingConfig.keepAlive,
+      mtu: rawConfig.MTU || existingConfig.mtu,
+      name: name || rawConfig.Name || existingConfig.name,
+      private_key: rawConfig.PrivateKey || existingConfig.privateKey,
+      remote_endpoint:
+        rawConfig.Endpoint ||
+        existingConfig.endpoint ||
+        `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
+      preshared_key: rawConfig.PresharedKey || existingConfig.preSharedKey,
+    }),
+  }
+
+  const response = await fetch(
+    `${env.WIREGUARD_API_ENDPOINT}/updatePeerSettings/${existingConfig.configuration.name}`,
+    requestOptions,
+  )
+
+  if (!response.ok) {
+    throw new Error(`Failed to update peer config: ${response.statusText}`)
+  }
 
   const updatedConfig = await db.peerConfig.update({
     where: { id, userId: userId || undefined },
     data: {
-      name: name || undefined,
-      userId: userId ? userId : currentUserId,
+      publicKey: rawConfig.PublicKey || existingConfig.publicKey,
+      dns: rawConfig.DNS || existingConfig.dns,
       allowedIPs:
         ipAddress !== undefined
           ? ipAddress
           : Array.isArray(rawConfig.AllowedIPs)
             ? rawConfig.AllowedIPs.join(", ")
-            : rawConfig.AllowedIPs || undefined,
-      dns: rawConfig.DNS || undefined,
-      mtu: rawConfig.MTU || undefined,
-      keepAlive: rawConfig.PersistentKeepalive || undefined,
+            : rawConfig.AllowedIPs || existingConfig.allowedIPs,
+      endpointAllowedIP: rawConfig.Address || existingConfig.endpointAllowedIP,
+      keepAlive: rawConfig.PersistentKeepalive || existingConfig.keepAlive,
+      mtu: rawConfig.MTU || existingConfig.mtu,
+      name: name || rawConfig.Name || existingConfig.name,
+      privateKey: rawConfig.PrivateKey || existingConfig.privateKey,
       endpoint:
         rawConfig.Endpoint ||
-        `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}` ||
-        undefined,
-      publicKey: rawConfig.PublicKey || undefined,
-      privateKey: rawConfig.PrivateKey || undefined,
-      endpointAllowedIP: rawConfig.Address || undefined,
+        existingConfig.endpoint ||
+        `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
+      preSharedKey: rawConfig.PresharedKey || existingConfig.preSharedKey,
+      userId: userId ? userId : currentUserId,
     },
   })
+
+  if (!updatedConfig) {
+    throw new Error("Failed to update peer config in the database")
+  }
 
   return updatedConfig
 }
