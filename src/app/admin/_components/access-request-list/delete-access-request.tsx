@@ -1,4 +1,7 @@
+"use client"
+
 import { Loader2, Trash2 } from "lucide-react"
+import { useState } from "react"
 
 import { Hint } from "@/components/hint"
 import {
@@ -13,50 +16,39 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import type { PeerConfigWithUser } from "@/types"
 
-interface DeleteConfigDialogProps {
-  config: PeerConfigWithUser
-  configToDelete: string | null
-  setConfigToDelete: (configId: string | null) => void
+interface DeleteAccessRequestProps {
   isDeleting: boolean
-  handleDeleteConfig: () => Promise<void>
+  handleDeleteAccessRequest: () => Promise<void>
 }
 
-export function DeleteConfigDialog({
-  config,
-  configToDelete,
-  setConfigToDelete,
+export function DeleteAccessRequest({
   isDeleting,
-  handleDeleteConfig,
-}: DeleteConfigDialogProps) {
+  handleDeleteAccessRequest,
+}: DeleteAccessRequestProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <AlertDialog
-      open={!!configToDelete}
-      onOpenChange={(open) => !open && setConfigToDelete(null)}
-    >
-      <AlertDialogTrigger asChild>
-        <Hint label="Delete Config" asChild>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <Hint label="Delete Access Request" asChild>
+        <AlertDialogTrigger asChild>
           <Button
-            disabled={isDeleting}
-            onClick={() => {
-              setConfigToDelete(config.id)
-              handleDeleteConfig()
-            }}
+            disabled={isOpen}
+            onClick={() => setIsOpen(true)}
             size="icon"
             variant="destructive"
           >
             <Trash2 className="size-4" />
-            <span className="sr-only">Delete Config</span>
+            <span className="sr-only">Delete Access Request</span>
           </Button>
-        </Hint>
-      </AlertDialogTrigger>
+        </AlertDialogTrigger>
+      </Hint>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the peer config and all its data. This
-            action cannot be undone.
+            This will permanently delete the access request and all its data.
+            This action cannot be undone.
             <br />
             Are you sure you want to proceed?
           </AlertDialogDescription>
@@ -65,7 +57,7 @@ export function DeleteConfigDialog({
           <div className="flex w-full justify-between">
             <AlertDialogAction
               disabled={isDeleting}
-              onClick={handleDeleteConfig}
+              onClick={handleDeleteAccessRequest}
               className="bg-destructive hover:bg-destructive/90"
             >
               {isDeleting ? (

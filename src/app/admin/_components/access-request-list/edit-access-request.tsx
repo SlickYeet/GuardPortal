@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AccessRequestStatus, type AccessRequest } from "@prisma/client"
+import { format } from "date-fns"
 import {
   CircleCheckBig,
   CircleEllipsis,
@@ -16,6 +17,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { updateAccessRequest } from "@/actions/access-requests"
+import { Hint } from "@/components/hint"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -75,15 +77,15 @@ export function formatStatusLabel(status: AccessRequestStatus) {
   }
 }
 
-interface DetailsModalProps {
+interface EditAccessRequestProps {
   request: AccessRequest
   loadAccessRequests: () => Promise<void>
 }
 
-export function DetailsModal({
+export function EditAccessRequest({
   request,
   loadAccessRequests,
-}: DetailsModalProps) {
+}: EditAccessRequestProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [status, setStatus] = useState<AccessRequestStatus | undefined>(
     undefined,
@@ -123,17 +125,19 @@ export function DetailsModal({
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          disabled={isOpen}
-          onClick={(prev) => setIsOpen(!prev)}
-          size="icon"
-          variant="outline"
-        >
-          <Edit className="size-4" />
-          <span className="sr-only">Edit Access Request</span>
-        </Button>
-      </DialogTrigger>
+      <Hint label="Edit Request" asChild>
+        <DialogTrigger asChild>
+          <Button
+            disabled={isOpen}
+            onClick={(prev) => setIsOpen(!prev)}
+            size="icon"
+            variant="outline"
+          >
+            <Edit className="size-4" />
+            <span className="sr-only">Edit Access Request</span>
+          </Button>
+        </DialogTrigger>
+      </Hint>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Access Request Details</DialogTitle>
@@ -164,7 +168,7 @@ export function DetailsModal({
           <Label className="text-sm font-medium">Requested At</Label>
           <Input
             disabled
-            value={new Date(request.createdAt).toLocaleString()}
+            value={format(request.createdAt, "MMM dd, yyyy HH:mm")}
           />
         </div>
 

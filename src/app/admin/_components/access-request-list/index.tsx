@@ -1,11 +1,15 @@
 "use client"
 
 import { AccessRequest } from "@prisma/client"
+import { format, set } from "date-fns"
 import { Loader2, RefreshCcw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-import { getAccessRequests } from "@/actions/access-requests"
+import {
+  deleteAccessRequest,
+  getAccessRequests,
+} from "@/actions/access-requests"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -17,11 +21,13 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-import { DetailsModal, formatStatusLabel } from "./details-modal"
+import { DeleteAccessRequest } from "./delete-access-request"
+import { EditAccessRequest, formatStatusLabel } from "./edit-access-request"
 
 export function AccessRequestList() {
   const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isDeleting, setisDeleting] = useState(false)
 
   useEffect(() => {
     loadAccessRequests()
@@ -41,6 +47,24 @@ export function AccessRequestList() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function handleDeleteAccessRequest(requestId: string) {
+    setisDeleting(true)
+    try {
+      await deleteAccessRequest(requestId)
+      toast.success("Access request deleted successfully.")
+      await loadAccessRequests()
+    } catch (error) {
+      console.error("Failed to delete access request:", error)
+      toast.error("Error", {
+        description: `Failed to delete access request: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      })
+    } finally {
+      setisDeleting(false)
     }
   }
 
@@ -94,13 +118,21 @@ export function AccessRequestList() {
                     {formatStatusLabel(request.status)}
                   </TableCell>
                   <TableCell>
-                    {new Date(request.createdAt).toLocaleString()}
+                    {format(request.createdAt, "MMM dd, yyyy HH:mm")}
                   </TableCell>
                   <TableCell>
-                    <DetailsModal
-                      request={request}
-                      loadAccessRequests={loadAccessRequests}
-                    />
+                    <div className="flex justify-end space-x-2">
+                      <EditAccessRequest
+                        request={request}
+                        loadAccessRequests={loadAccessRequests}
+                      />
+                      <DeleteAccessRequest
+                        isDeleting={isDeleting}
+                        handleDeleteAccessRequest={() =>
+                          handleDeleteAccessRequest(request.id)
+                        }
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

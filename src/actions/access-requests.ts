@@ -175,3 +175,28 @@ export async function updateAccessRequest(
     )
   }
 }
+
+export async function deleteAccessRequest(requestId: string) {
+  try {
+    const existingRequest = await db.accessRequest.findUnique({
+      where: { id: requestId },
+    })
+
+    if (!existingRequest) {
+      throw new Error("Access request not found")
+    }
+
+    await db.accessRequest.delete({
+      where: { id: requestId },
+    })
+
+    return true
+  } catch (error) {
+    console.error("Failed to delete access request:", error)
+    throw new Error(
+      `Failed to delete access request: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+    )
+  }
+}
