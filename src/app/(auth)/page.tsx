@@ -49,7 +49,7 @@ export default async function HomePage() {
         {userCount > 0 && (
           <>
             <SignInForm />
-            <div className="text-muted-foreground text-center text-sm">
+            <div className="text-muted-foreground mx-auto max-w-xs text-center text-sm text-balance">
               <p>
                 To request access, please fill out the{" "}
                 <Link

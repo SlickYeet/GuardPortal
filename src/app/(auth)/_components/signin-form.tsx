@@ -107,14 +107,6 @@ export function SignInForm() {
                   </FormItem>
                 )}
               />
-
-              {/* TODO */}
-              {/* <Link
-                href="/forgot-password"
-                className="text-muted-foreground text-sm underline-offset-2 hover:underline"
-              >
-                Forgot password?
-              </Link> */}
             </div>
 
             {form.formState.errors.root && (
