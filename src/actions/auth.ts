@@ -16,11 +16,12 @@ export async function createFirstUserAsAdmin(
   const email = values.email || env.ADMIN_EMAIL
   const password = values.password || env.ADMIN_PASSWORD
 
-  const res = await auth.api.signUpEmail({
+  const res = await auth.api.createUser({
     body: {
       name,
       email,
       password,
+      role: "admin",
     },
     asResponse: true,
   })

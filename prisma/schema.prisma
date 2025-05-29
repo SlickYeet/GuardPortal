@@ -13,6 +13,10 @@ model User {
     email         String
     emailVerified Boolean
     image         String?     @default("https://gravatar.com/avatar/HASH")
+    role          String?     @default("user")
+    banned        Boolean?
+    banReason     String?
+    banExpires    DateTime?
     createdAt     DateTime
     updatedAt     DateTime
     sessions      Session[]
@@ -24,15 +28,16 @@ model User {
 }
 
 model Session {
-    id        String   @id
-    expiresAt DateTime
-    token     String
-    createdAt DateTime
-    updatedAt DateTime
-    ipAddress String?
-    userAgent String?
-    userId    String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id             String   @id
+    expiresAt      DateTime
+    token          String
+    createdAt      DateTime
+    updatedAt      DateTime
+    ipAddress      String?
+    userAgent      String?
+    impersonatedBy String?
+    userId         String
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([token])
     @@map("session")

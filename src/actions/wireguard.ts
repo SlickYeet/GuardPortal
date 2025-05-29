@@ -6,7 +6,10 @@ import { headers } from "next/headers"
 import { z } from "zod"
 
 import { env } from "@/env"
-import { parsePeerConfig } from "@/lib/wireguard"
+import {
+  parsePeerConfig,
+  type PeerConfigWithConfiguration,
+} from "@/lib/wireguard"
 import { ConfigUpdateSchema } from "@/schemas/config"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
@@ -212,10 +215,14 @@ export async function getPeerConfigsFromDB() {
   }
 }
 
-export async function addPeerConfig(name: string, ipAddress?: string) {
+export async function addPeerConfig(
+  name: string,
+  userId: string,
+  ipAddress?: string,
+) {
   try {
-    const existingConfig = await db.peerConfig.findFirst({
-      where: { name, allowedIPs: ipAddress || undefined },
+    const existingConfig = await db.peerConfig.findUnique({
+      where: { userId },
       select: {
         id: true,
         configuration: {
@@ -232,6 +239,8 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
       )
     }
 
+    const configName = `${name}'s Config`
+
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
@@ -239,7 +248,7 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
         "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
       },
       body: JSON.stringify({
-        name,
+        name: configName,
         ...(ipAddress ? { allowed_ips: [ipAddress] } : {}),
         endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
       }),
@@ -256,7 +265,31 @@ export async function addPeerConfig(name: string, ipAddress?: string) {
     }
 
     const json = await response.json()
-    return json.data
+    console.log("Peer config added successfully:", json.data)
+    const peer = Array.isArray(json.data) ? json.data[0] : json.data
+    return {
+      name: configName,
+      userId: userId,
+      publicKey: peer.id,
+      privateKey: peer.private_key,
+      allowedIPs: peer.allowed_ip || ipAddress,
+      endpoint: `${peer.remote_endpoint || env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
+      endpointAllowedIP: peer.endpoint_allowed_ip,
+      keepAlive: peer.keepalive || 0,
+      mtu: peer.mtu || 1420,
+      preSharedKey: peer.preshared_key || "",
+      dns: peer.DNS,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      configurationId: peer.configuration_id,
+      configuration: {
+        name: peer.configuration.Name,
+        address: peer.configuration.Address,
+        listenPort: peer.configuration.ListenPort || env.WIREGUARD_VPN_PORT,
+        publicKey: peer.configuration.PublicKey,
+        privateKey: peer.configuration.PrivateKey,
+      },
+    } as PeerConfigWithConfiguration
   } catch (error) {
     console.error("Error adding peer config:", error)
     throw new Error(

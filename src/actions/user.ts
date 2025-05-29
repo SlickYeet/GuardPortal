@@ -13,11 +13,12 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
   try {
     const validatedData = UserSchema.parse(values)
 
-    const existingUsers = await db.user.count({
+    const existingUser = await db.user.findUnique({
       where: { email: validatedData.email },
+      select: { id: true, name: true },
     })
 
-    if (existingUsers > 0) {
+    if (existingUser) {
       return {
         success: false,
         message: "User with this email already exists.",
@@ -27,12 +28,8 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
     const tempPassword = generateTemporaryPassword()
     const hashedPassword = await hash(tempPassword, 12)
 
-    const wireguardConfig = await addPeerConfig(
-      validatedData.name,
-      validatedData.ipAddress,
-    )
-
-    const newUser = await auth.api.signUpEmail({
+    // TODO: prevent the admin from being logged out after creating a new user
+    const newUser = await auth.api.createUser({
       body: {
         name: validatedData.name,
         email: validatedData.email,
@@ -47,29 +44,53 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
       }
     }
 
-    const result = await db.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { email: validatedData.email },
-      })
+    const user = await db.user.findUnique({
+      where: { email: validatedData.email },
+      select: { id: true, name: true },
+    })
 
-      if (!user) {
-        throw new Error("User not found after creation.")
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found after creation.",
       }
+    }
 
-      await tx.peerConfig.create({
-        data: {
-          ...wireguardConfig,
-          name: validatedData.name,
-          userId: user.id,
+    const wireguardConfig = await addPeerConfig(
+      validatedData.name,
+      user.id,
+      validatedData.ipAddress,
+    )
+
+    await db.peerConfig.create({
+      data: {
+        name: wireguardConfig.name,
+        publicKey: wireguardConfig.publicKey,
+        privateKey: wireguardConfig.privateKey,
+        allowedIPs: wireguardConfig.allowedIPs,
+        endpoint: wireguardConfig.endpoint,
+        endpointAllowedIP: wireguardConfig.endpointAllowedIP,
+        dns: wireguardConfig.dns,
+        configuration: {
+          create: {
+            name: wireguardConfig.configuration.name,
+            address: wireguardConfig.configuration.address,
+            listenPort: wireguardConfig.configuration.listenPort,
+            publicKey: wireguardConfig.configuration.publicKey,
+            privateKey: wireguardConfig.configuration.privateKey,
+          },
         },
-      })
-
-      return user
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
     })
 
     return {
       success: true,
-      userId: result.id,
+      userId: user.id,
       tempPassword,
     }
   } catch (error) {
@@ -126,7 +147,7 @@ export async function getUsers() {
 
 export async function deleteUser(userId: string) {
   try {
-    const deletedUser = await db.user.delete({
+    const existingUser = await db.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -138,20 +159,21 @@ export async function deleteUser(userId: string) {
       },
     })
 
-    if (!deletedUser) {
+    if (!existingUser) {
       return {
         success: false,
         message: "User not found.",
       }
     }
-    if (!deletedUser.config) {
+    if (!existingUser.config) {
       return {
         success: false,
         message: "User has no associated WireGuard configuration.",
       }
     }
 
-    const deletedConfig = await deletePeerConfig(deletedUser.config.id)
+    // TODO: Not working
+    const deletedConfig = await deletePeerConfig(existingUser.config.id)
 
     if (!deletedConfig) {
       return {
@@ -159,6 +181,10 @@ export async function deleteUser(userId: string) {
         message: "Failed to delete WireGuard configuration.",
       }
     }
+
+    await db.user.delete({
+      where: { id: userId },
+    })
 
     return {
       success: true,
