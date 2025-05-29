@@ -11,3 +11,7 @@ export const ConfigSchema = z.object({
       message: "IP address must start with 10.",
     }),
 })
+
+export const ConfigUpdateSchema = ConfigSchema.partial().extend({
+  id: z.string().min(1, "Config ID is required"),
+})

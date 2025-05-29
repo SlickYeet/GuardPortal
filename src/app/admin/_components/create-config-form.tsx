@@ -241,6 +241,9 @@ export function CreateConfigForm({
               </p>
             </AccordionTrigger>
             <AccordionContent>
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                This is an advanced option. Use with caution.
+              </p>
               <FormField
                 control={form.control}
                 name="content"

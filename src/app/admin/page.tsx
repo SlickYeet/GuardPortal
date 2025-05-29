@@ -104,7 +104,7 @@ export default async function AdminPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ConfigList />
+                <ConfigList defaultConfig={defaultConfig} />
               </CardContent>
             </Card>
           </TabsContent>

@@ -1,32 +1,17 @@
 "use client"
 
-import { Edit, Loader2, RefreshCcw, Trash2 } from "lucide-react"
+import { Loader2, RefreshCcw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { z } from "zod"
 
-import { deletePeerConfig, getPeerConfigsFromDB } from "@/actions/wireguard"
-import { Hint } from "@/components/hint"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+  deletePeerConfig,
+  getPeerConfigsFromDB,
+  updatePeerConfig,
+} from "@/actions/wireguard"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import {
   HoverCard,
   HoverCardContent,
@@ -41,13 +26,18 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { ConfigSchema } from "@/schemas/config"
 import type { PeerConfigWithUser } from "@/types"
 
-export function ConfigList() {
+import { DeleteConfigDialog } from "./delete-config-dialog"
+import { EditConfigDialog } from "./edit-config-dialog"
+
+export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
   const [configs, setConfigs] = useState<PeerConfigWithUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [configToDelete, setConfigToDelete] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [configToEdit, setConfigToEdit] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
@@ -85,6 +75,27 @@ export function ConfigList() {
     } finally {
       setIsDeleting(false)
       setConfigToDelete(null)
+    }
+  }
+
+  async function handleEditConfig(
+    values: Partial<z.infer<typeof ConfigSchema>>,
+  ) {
+    if (!configToEdit) return
+    setIsEditing(true)
+
+    try {
+      await updatePeerConfig(values)
+      toast.success("Config updated successfully")
+      loadConfigs()
+    } catch (error) {
+      console.error("Failed to edit config:", error)
+      toast.error("Error", {
+        description: `Failed to edit config: ${error instanceof Error ? error.message : "Unknown error"}`,
+      })
+    } finally {
+      setIsEditing(false)
+      setConfigToEdit(null)
     }
   }
 
@@ -174,34 +185,21 @@ export function ConfigList() {
                   )}
                   <TableCell>
                     <div className="flex justify-end space-x-2">
-                      <Hint label="Edit Config" asChild>
-                        <Button
-                          disabled={isEditing}
-                          onClick={() => setIsEditing(true)}
-                          size="icon"
-                          variant="outline"
-                        >
-                          <span className="sr-only">View Config</span>
-                          <Edit className="size-4" />
-                        </Button>
-                      </Hint>
-                      <Hint label="Delete Config" asChild>
-                        <Button
-                          disabled={isDeleting}
-                          onClick={() => {
-                            setConfigToDelete(config.id)
-                            handleDeleteConfig()
-                          }}
-                          size="icon"
-                          variant="destructive"
-                        >
-                          {isDeleting && configToDelete === config.id ? (
-                            <Loader2 className="size-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="size-4" />
-                          )}
-                        </Button>
-                      </Hint>
+                      <EditConfigDialog
+                        initConfig={config}
+                        configToEdit={configToEdit}
+                        setConfigToEdit={setConfigToEdit}
+                        isEditing={isEditing}
+                        handleEditConfig={handleEditConfig}
+                        defaultConfig={defaultConfig}
+                      />
+                      <DeleteConfigDialog
+                        config={config}
+                        configToDelete={configToDelete}
+                        setConfigToDelete={setConfigToDelete}
+                        isDeleting={isDeleting}
+                        handleDeleteConfig={handleDeleteConfig}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -210,64 +208,6 @@ export function ConfigList() {
           </Table>
         </div>
       )}
-
-      <AlertDialog
-        open={!!configToDelete}
-        onOpenChange={(open) => !open && setConfigToDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the peer config and all its data.
-              This action cannot be undone.
-              <br />
-              <span className="font-bold">Note: </span>Currently this does not
-              delete the peer from WireGuard.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <div className="flex w-full justify-between">
-              <AlertDialogAction
-                disabled={isDeleting}
-                onClick={handleDeleteConfig}
-                className="bg-destructive hover:bg-destructive/80"
-              >
-                {isDeleting ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    <span>Deleting...</span>
-                  </>
-                ) : (
-                  <span>Delete</span>
-                )}
-              </AlertDialogAction>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-            </div>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Config</DialogTitle>
-            <DialogDescription>
-              This functionality is not implemented yet.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <div className="flex w-full justify-between">
-              <DialogClose asChild>
-                <Button onClick={() => setIsEditing(false)} variant="outline">
-                  Close
-                </Button>
-              </DialogClose>
-              <Button>Save Changes</Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

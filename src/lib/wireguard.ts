@@ -1,27 +1,24 @@
 export function parsePeerConfig(config: string) {
-  try {
-    const parsed = JSON.parse(config)
-    const obj = Array.isArray(parsed) ? parsed[0] : parsed
-
-    return {
-      server: obj.remote_endpoint ?? obj.endpoint ?? "",
-      allowedIPs:
-        obj.allowed_ip ??
-        obj.endpoint_allowed_ip ??
-        obj.configuration?.Address ??
-        "",
-      dns: obj.DNS ?? "",
-    }
-  } catch {
-    const endpointMatch = config.match(/Endpoint\s*=\s*(.+)/)
-    const allowedIPsMatch = config.match(/AllowedIPs?\s*=\s*(.+)/)
-    const addressMatch = config.match(/Address\s*=\s*(.+)/)
-    const dnsMatch = config.match(/DNS\s*=\s*(.+)/)
-
-    return {
-      server: endpointMatch?.[1] ?? "",
-      allowedIPs: allowedIPsMatch?.[1] ?? addressMatch?.[1] ?? "",
-      dns: dnsMatch?.[1] ?? "",
-    }
+  function parseSection(section: string): Record<string, string> {
+    const result: Record<string, string> = {}
+    section.split("\n").forEach((line) => {
+      const match = line.match(/^\s*([\w\d]+)\s*=\s*(.+)\s*$/)
+      if (match) {
+        result[match[1]] = match[2]
+      }
+    })
+    return result
   }
+
+  const sectionRegex = /\[([^\]]+)\]([\s\S]*?)(?=\n\[|$)/g
+  let match
+  const configObj: Record<string, Record<string, string>> = {}
+
+  while ((match = sectionRegex.exec(config)) !== null) {
+    const sectionName = match[1].trim()
+    const sectionBody = match[2].trim()
+    configObj[sectionName] = parseSection(sectionBody)
+  }
+
+  return configObj
 }
