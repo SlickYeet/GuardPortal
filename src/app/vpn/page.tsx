@@ -7,6 +7,7 @@ import {
   Settings,
   Settings2,
 } from "lucide-react"
+import { type Metadata } from "next"
 import { headers } from "next/headers"
 import Link from "next/link"
 
@@ -25,6 +26,37 @@ import { UserMenu } from "@/components/user-menu"
 import { isUserAdmin } from "@/lib/utils"
 import type { PeerConfigWithConfiguration } from "@/lib/wireguard"
 import { auth } from "@/server/auth"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  const user = session?.user
+
+  if (!user) {
+    return {
+      title: "VPN Configuration",
+      description: "Please log in to view your VPN configuration.",
+    }
+  }
+
+  const isAdmin = isUserAdmin(user)
+
+  const config = await getPeerConfigByUserId(user.id)
+  if (!config) {
+    return {
+      title: `${user.name || user.email} - No VPN Configuration`,
+      description: isAdmin
+        ? "You have no VPN configuration set up yet."
+        : "You have no VPN configuration set up yet. Please contact your administrator.",
+    }
+  }
+
+  return {
+    title: `${user.name || user.email} - ${config.name} VPN Configuration`,
+    description: `Your VPN configuration for ${config.name}. Scan the QR code or download the config file to set up your VPN.`,
+  }
+}
 
 export default async function VPNPage() {
   const session = await auth.api.getSession({
