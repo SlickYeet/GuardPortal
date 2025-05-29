@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useState, type ReactNode } from "react"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,12 +20,19 @@ export function AdminTabs({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [activeTab, setActiveTab] = useState<TabValue>(() => {
+  const getTabFromParams = () => {
     const urlTab = searchParams.get("tab")
     return validTabs.includes(urlTab as TabValue)
       ? (urlTab as TabValue)
       : "create-user"
-  })
+  }
+
+  const [activeTab, setActiveTab] = useState<TabValue>(getTabFromParams)
+
+  useEffect(() => {
+    const tab = getTabFromParams()
+    setActiveTab(tab)
+  }, [searchParams])
 
   const createQueryString = useCallback(
     (name: string, value: string) => {

@@ -10,6 +10,7 @@ import {
   deleteAccessRequest,
   getAccessRequests,
 } from "@/actions/access-requests"
+import { CreateUserFromAccessRequest } from "@/app/admin/_components/access-request-list/create-user-from-access-request"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -122,6 +123,7 @@ export function AccessRequestList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end space-x-2">
+                      <CreateUserFromAccessRequest request={request} />
                       <EditAccessRequest
                         request={request}
                         loadAccessRequests={loadAccessRequests}

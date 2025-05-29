@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Plus, RefreshCw } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -17,6 +18,10 @@ import { cn } from "@/lib/utils"
 import { UserSchema } from "@/schemas/user"
 
 export function CreateUserForm() {
+  const searchParams = useSearchParams()
+  const name = searchParams.get("name") || ""
+  const email = searchParams.get("email") || ""
+
   const [availableIps, setAvailableIps] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingIps, setIsLoadingIps] = useState(true)
@@ -36,6 +41,11 @@ export function CreateUserForm() {
       ipAddress: "",
     },
   })
+
+  useEffect(() => {
+    setValue("name", name)
+    setValue("email", email)
+  }, [name, email, setValue])
 
   useEffect(() => {
     loadAvailableIps()
