@@ -4,6 +4,7 @@ import { type User } from "better-auth"
 import {
   CheckCircle,
   Copy,
+  CopyCheck,
   Key,
   Loader2,
   RefreshCcw,
@@ -26,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -42,8 +44,12 @@ export function UsersList({ currentUser }: { currentUser: User }) {
   const [isLoading, setIsLoading] = useState(true)
   const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isResetting, setIsResetting] = useState<string | null>(null)
+  const [userToResetPassword, setUserToResetPassword] = useState<string | null>(
+    null,
+  )
+  const [isResettings, setIsResettings] = useState(false)
   const [newPassword, setNewPassword] = useState<string | null>(null)
+  const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
     loadUsers()
@@ -86,7 +92,9 @@ export function UsersList({ currentUser }: { currentUser: User }) {
   }
 
   async function handleResetPassword(userId: string) {
-    setIsResetting(userId)
+    if (!userId) return
+
+    setIsResettings(true)
     try {
       const result = await resetUserPassword(userId)
       if (result.success) {
@@ -105,7 +113,8 @@ export function UsersList({ currentUser }: { currentUser: User }) {
         description: `Failed to reset password: ${error instanceof Error ? error.message : "Unknown error"}`,
       })
     } finally {
-      setIsResetting(null)
+      setIsResettings(false)
+      setUserToResetPassword(null)
     }
   }
 
@@ -173,13 +182,12 @@ export function UsersList({ currentUser }: { currentUser: User }) {
                     <div className="flex justify-end space-x-2">
                       <Hint label="Reset Password" asChild>
                         <Button
-                          disabled={isResetting === user.id}
-                          // TODO: Add confirmation dialog
-                          onClick={() => handleResetPassword(user.id)}
+                          disabled={!!userToResetPassword}
+                          onClick={() => setUserToResetPassword(user.id)}
                           size="icon"
                           variant="outline"
                         >
-                          {isResetting === user.id ? (
+                          {isResettings ? (
                             <Loader2 className="size-4 animate-spin" />
                           ) : (
                             <Key className="size-4" />
@@ -239,44 +247,79 @@ export function UsersList({ currentUser }: { currentUser: User }) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {newPassword && (
-        <AlertDialog
-          open={!!newPassword}
-          onOpenChange={(open) => !open && setNewPassword(null)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Password Reset</AlertDialogTitle>
-              <AlertDialogDescription>
-                A new temporary password has been generated. Make sure to copy
-                it now as it won&apos;t be shown again.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="flex items-center justify-between rounded-md border p-2">
-              <code className="font-mono text-sm">{newPassword}</code>
+      <AlertDialog
+        open={!!userToResetPassword}
+        onOpenChange={(open) => !open && setUserToResetPassword(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Password Reset</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to generate a new temporary password for
+              this user? They will need to use this new password to log in.
+              <br />
+              <span className="font-bold">NOTE:</span> An email will be sent to
+              the user with the new credentials.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="relative mb-2">
+            <Input disabled value={newPassword ?? ""} />
+            <Button
+              disabled={!newPassword}
+              onClick={() => {
+                if (!newPassword) return
+                navigator.clipboard.writeText(newPassword ?? "")
+                setIsCopied(true)
+                toast.success("Copied to clipboard", {
+                  description:
+                    "The new temporary password has been copied to your clipboard.",
+                })
+                setTimeout(() => setIsCopied(false), 2000)
+              }}
+              size="icon"
+              variant="ghost"
+              className="absolute top-1/2 right-2 -translate-y-1/2"
+            >
+              {isCopied ? (
+                <>
+                  <CopyCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="sr-only">Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="size-4" />
+                  <span className="sr-only">Copy Password</span>
+                </>
+              )}
+            </Button>
+          </div>
+
+          <AlertDialogFooter>
+            <div className="flex w-full justify-between">
+              <AlertDialogCancel disabled={isResettings}>
+                {newPassword ? "Close" : "Cancel"}
+              </AlertDialogCancel>
               <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  navigator.clipboard.writeText(newPassword)
-                  toast.success("Copied to clipboard", {
-                    description:
-                      "The new password has been copied to your clipboard.",
-                  })
-                }}
+                disabled={!userToResetPassword}
+                onClick={() => handleResetPassword(userToResetPassword!)}
+                variant="destructive"
               >
-                <Copy className="size-4" />
-                Copy
+                {isResettings ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    <span>Resetting Password...</span>
+                  </>
+                ) : (
+                  <>
+                    <Key className="size-4" />
+                    <span>Reset Password</span>
+                  </>
+                )}
               </Button>
             </div>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={() => setNewPassword(null)}>
-                Done
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

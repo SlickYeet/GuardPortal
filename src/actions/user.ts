@@ -225,12 +225,36 @@ export async function resetUserPassword(userId: string) {
       }
     }
 
-    for (const account of user.accounts) {
+    const credentialAccounts = user.accounts.filter(
+      (account) => account.providerId === "credential",
+    )
+
+    if (credentialAccounts.length === 0) {
+      return {
+        success: false,
+        message: "No credential-based account found for the user.",
+      }
+    }
+
+    for (const account of credentialAccounts) {
       await db.account.update({
-        where: { id: account.id, providerId: "credential" },
+        where: { id: account.id },
         data: { password: hashedPassword },
       })
     }
+
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        isFirstLogin: true,
+      },
+    })
+
+    await auth.api.revokeUserSessions({
+      body: {
+        userId,
+      },
+    })
 
     await sendEmail({
       to: user.email,
@@ -238,7 +262,7 @@ export async function resetUserPassword(userId: string) {
       template: "new-user",
       data: {
         email: user.email,
-        password: hashedPassword,
+        password: tempPassword,
       },
     })
 

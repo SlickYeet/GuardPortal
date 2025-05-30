@@ -1,5 +1,6 @@
 "use server"
 
+import { compare } from "bcryptjs"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
@@ -45,6 +46,12 @@ export async function createFirstUserAsAdmin(
 }
 
 export async function signIn(values: z.infer<typeof SignInSchema>) {
+  const { email, password, rememberMe } = values
+
+  if (!email || !password) {
+    return { error: "Email and password are required." }
+  }
+
   const session = await auth.api.getSession({
     headers: await headers(),
   })
@@ -57,10 +64,33 @@ export async function signIn(values: z.infer<typeof SignInSchema>) {
     }
   }
 
-  const { email, password, rememberMe } = values
+  const user = await db.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      accounts: {
+        select: {
+          id: true,
+          password: true,
+          providerId: true,
+        },
+      },
+    },
+  })
 
-  if (!email || !password) {
-    return { error: "Email and password are required." }
+  if (!user) {
+    return { error: "No user with that email found." }
+  }
+
+  const account = user.accounts.find((acc) => acc.providerId === "credential")
+  if (!account || !account.password) {
+    return { error: "Invalid credentials." }
+  }
+
+  const isPasswordValid = await compare(password, account.password)
+  if (!isPasswordValid) {
+    return { error: "Password is incorrect." }
   }
 
   const res = await auth.api.signInEmail({
