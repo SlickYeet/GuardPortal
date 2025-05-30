@@ -48,7 +48,6 @@ export function UsersList({ currentUser }: { currentUser: User }) {
     null,
   )
   const [isResettings, setIsResettings] = useState(false)
-  const [newPassword, setNewPassword] = useState<string | null>(null)
   const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
@@ -98,7 +97,6 @@ export function UsersList({ currentUser }: { currentUser: User }) {
     try {
       const result = await resetUserPassword(userId)
       if (result.success) {
-        setNewPassword(result.tempPassword || "")
         toast.success("Password Reset", {
           description: "A new temporary password has been generated.",
         })
@@ -262,42 +260,11 @@ export function UsersList({ currentUser }: { currentUser: User }) {
               the user with the new credentials.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="relative mb-2">
-            <Input disabled value={newPassword ?? ""} />
-            <Button
-              disabled={!newPassword}
-              onClick={() => {
-                if (!newPassword) return
-                navigator.clipboard.writeText(newPassword ?? "")
-                setIsCopied(true)
-                toast.success("Copied to clipboard", {
-                  description:
-                    "The new temporary password has been copied to your clipboard.",
-                })
-                setTimeout(() => setIsCopied(false), 2000)
-              }}
-              size="icon"
-              variant="ghost"
-              className="absolute top-1/2 right-2 -translate-y-1/2"
-            >
-              {isCopied ? (
-                <>
-                  <CopyCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
-                  <span className="sr-only">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="size-4" />
-                  <span className="sr-only">Copy Password</span>
-                </>
-              )}
-            </Button>
-          </div>
 
           <AlertDialogFooter>
             <div className="flex w-full justify-between">
               <AlertDialogCancel disabled={isResettings}>
-                {newPassword ? "Close" : "Cancel"}
+                Cancel
               </AlertDialogCancel>
               <Button
                 disabled={!userToResetPassword}
