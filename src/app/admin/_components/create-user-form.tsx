@@ -64,7 +64,7 @@ export function CreateUserForm() {
   useEffect(() => {
     form.setValue("name", name)
     form.setValue("email", email)
-  }, [name, email, form.setValue])
+  }, [name, email, form])
 
   useEffect(() => {
     loadAvailableIps()

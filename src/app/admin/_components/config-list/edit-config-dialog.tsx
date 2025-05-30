@@ -234,8 +234,7 @@ export function EditConfigDialog({
                               : "Select an IP address"
                           }
                           searchPlaceholder="Search IP addresses..."
-                          width="calc(100% - 50px)"
-                          height="200px"
+                          className="w-[calc(100%-52px)]"
                         />
                       </FormControl>
                       <Hint label="Refresh IPs" asChild>

@@ -165,14 +165,22 @@ export async function getAvailableConfigurations() {
       throw new Error("Unexpected response format")
     }
 
-    return json.data.map((configuration: any) => ({
-      id: configuration.PublicKey,
-      name: configuration.Name,
-      address: configuration.Address,
-      listenPort: configuration.ListenPort || env.WIREGUARD_VPN_PORT,
-      publicKey: configuration.PublicKey,
-      privateKey: configuration.PrivateKey,
-    })) as Configuration[]
+    return json.data.map(
+      (configuration: {
+        PublicKey: string
+        Name: string
+        Address: string
+        ListenPort: string
+        PrivateKey: string
+      }) => ({
+        id: configuration.PublicKey,
+        name: configuration.Name,
+        address: configuration.Address,
+        listenPort: configuration.ListenPort || env.WIREGUARD_VPN_PORT,
+        publicKey: configuration.PublicKey,
+        privateKey: configuration.PrivateKey,
+      }),
+    ) as Configuration[]
   } catch (error) {
     console.error("Error fetching available configurations:", error)
     return Promise.reject({
