@@ -1,5 +1,6 @@
 "use client"
 
+import { type Configuration } from "@prisma/client"
 import { Edit, Loader2, RefreshCw, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -7,7 +8,10 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { getUsers } from "@/actions/user"
-import { getAvailablePeerIPs } from "@/actions/wireguard"
+import {
+  getAvailableConfigurations,
+  getAvailablePeerIPs,
+} from "@/actions/wireguard"
 import { Hint } from "@/components/hint"
 import {
   Accordion,
@@ -72,11 +76,29 @@ export function EditConfigDialog({
   const [users, setUsers] = useState<User[]>([])
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
   const [availableIps, setAvailableIps] = useState<string[]>([])
+  const [availableConfigurations, setAvailableConfigurations] = useState<
+    Configuration[]
+  >([])
   const [isLoadingIps, setIsLoadingIps] = useState(true)
+  const [isLoadingConfigurations, setIsLoadingConfigurations] = useState(true)
+
+  const configName = parseConfigName(initConfig.name)
+
+  const form = useForm<Partial<z.infer<typeof ConfigUpdateSchema>>>({
+    defaultValues: {
+      id: initConfig.id,
+      name: configName,
+      userId: initConfig?.user.id,
+      configurationName: initConfig?.configuration.name,
+      ipAddress: initConfig?.allowedIPs,
+      content: "",
+    },
+  })
 
   useEffect(() => {
     loadUsers()
     loadAvailableIps()
+    loadAvailableConfigurations()
   }, [])
 
   async function loadUsers() {
@@ -112,17 +134,20 @@ export function EditConfigDialog({
     }
   }
 
-  const configName = parseConfigName(initConfig.name)
-
-  const form = useForm<Partial<z.infer<typeof ConfigUpdateSchema>>>({
-    defaultValues: {
-      id: initConfig.id,
-      name: configName,
-      userId: initConfig?.user.id,
-      ipAddress: initConfig?.allowedIPs,
-      content: "",
-    },
-  })
+  async function loadAvailableConfigurations() {
+    setIsLoadingConfigurations(true)
+    try {
+      const configurations = await getAvailableConfigurations()
+      setAvailableConfigurations(configurations)
+    } catch (error) {
+      console.error("Error loading configurations:", error)
+      toast.error("Error", {
+        description: "Failed to load configurations",
+      })
+    } finally {
+      setIsLoadingConfigurations(false)
+    }
+  }
 
   const isSubmitting = form.formState.isSubmitting
 
@@ -226,7 +251,7 @@ export function EditConfigDialog({
                       <FormControl>
                         <VirtualizedCombobox
                           options={availableIps}
-                          value={field.value}
+                          defaultValue={field.value}
                           onSelectOption={(value) => {
                             field.onChange(value)
                           }}
@@ -259,6 +284,55 @@ export function EditConfigDialog({
                     <FormDescription>
                       If left blank, a random IP will be assigned.
                     </FormDescription>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="configurationName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Configuration Name</FormLabel>
+                    <div className="flex items-center justify-between gap-4">
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a configuration" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableConfigurations.map((configuration) => (
+                            <SelectItem
+                              key={configuration.name}
+                              value={configuration.name}
+                            >
+                              {configuration.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Hint label="Refresh Configurations" asChild>
+                        <Button
+                          type="button"
+                          disabled={isLoadingConfigurations}
+                          onClick={loadAvailableConfigurations}
+                          tabIndex={-1}
+                          size="icon"
+                          variant="outline"
+                        >
+                          <RefreshCw
+                            className={cn(
+                              "size-4",
+                              isLoadingConfigurations ? "animate-spin" : "",
+                            )}
+                          />
+                        </Button>
+                      </Hint>
+                    </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

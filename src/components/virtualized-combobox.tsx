@@ -120,6 +120,7 @@ const VirtualizedCommand = ({
   return (
     <Command shouldFilter={false} onKeyDown={handleKeyDown}>
       <CommandInput onValueChange={handleSearch} placeholder={placeholder} />
+      {/* TODO: Fix not being able to scroll when inside dialog */}
       <CommandList
         ref={parentRef}
         style={{
@@ -185,17 +186,26 @@ interface VirtualizedComboboxProps extends React.ComponentProps<"select"> {
   onSelectOption?: (option: string) => void
   selectPlaceholder?: string
   searchPlaceholder?: string
+  width?: string
 }
 
 export function VirtualizedCombobox({
   options,
+  defaultValue,
   onSelectOption: onSelectOptionFromProps,
   selectPlaceholder = "Select an item",
   searchPlaceholder = "Search items...",
+  width = "400px",
   className,
 }: VirtualizedComboboxProps) {
   const [open, setOpen] = React.useState(false)
-  const [selectedOption, setSelectedOption] = React.useState("")
+  const [selectedOption, setSelectedOption] = React.useState(
+    (defaultValue as string) ?? "",
+  )
+
+  React.useEffect(() => {
+    setSelectedOption((defaultValue as string) ?? "")
+  }, [defaultValue])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -207,14 +217,14 @@ export function VirtualizedCombobox({
           className="cursor-default justify-between"
         >
           {selectedOption ? (
-            options.find((option) => option === selectedOption)
+            <span>{selectedOption}</span>
           ) : (
             <span className="text-muted-foreground">{selectPlaceholder}</span>
           )}
           <ChevronDown className="ml-2 size-4 shrink-0 opacity-30" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0">
+      <PopoverContent className="p-0" style={{ width: width }}>
         <VirtualizedCommand
           options={options.map((option) => ({ value: option, label: option }))}
           placeholder={searchPlaceholder}
