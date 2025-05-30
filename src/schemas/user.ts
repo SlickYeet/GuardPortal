@@ -9,6 +9,7 @@ export const UserSchema = z.object({
     .refine((value) => value === "" || value?.startsWith("10."), {
       message: "IP address must start with 10.",
     }),
+  configurationName: z.string().nonempty("Configuration name is required"),
 })
 
 export const ResetUserPasswordSchema = z.object({

@@ -29,6 +29,7 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
     const wireguardConfig = await addPeerConfig(
       formattedName,
       validatedData.userId,
+      validatedData.configurationName,
       validatedData.ipAddress,
     )
 

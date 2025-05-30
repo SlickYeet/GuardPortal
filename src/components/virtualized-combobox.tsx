@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronDown } from "lucide-react"
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -24,7 +24,6 @@ type Option = {
 }
 
 interface VirtualizedCommandProps extends React.ComponentProps<"select"> {
-  height: string
   options: Option[]
   placeholder: string
   selectedOption: string
@@ -32,7 +31,6 @@ interface VirtualizedCommandProps extends React.ComponentProps<"select"> {
 }
 
 const VirtualizedCommand = ({
-  height,
   options,
   placeholder,
   selectedOption,
@@ -125,7 +123,6 @@ const VirtualizedCommand = ({
       <CommandList
         ref={parentRef}
         style={{
-          height: height,
           width: "100%",
           overflow: "auto",
         }}
@@ -188,8 +185,6 @@ interface VirtualizedComboboxProps extends React.ComponentProps<"select"> {
   onSelectOption?: (option: string) => void
   selectPlaceholder?: string
   searchPlaceholder?: string
-  width?: string
-  height?: string
 }
 
 export function VirtualizedCombobox({
@@ -197,35 +192,30 @@ export function VirtualizedCombobox({
   onSelectOption: onSelectOptionFromProps,
   selectPlaceholder = "Select an item",
   searchPlaceholder = "Search items...",
-  width = "400px",
-  height = "400px",
+  className,
 }: VirtualizedComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [selectedOption, setSelectedOption] = React.useState("")
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger className={className} asChild>
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className="cursor-default justify-between"
-          style={{
-            width: width,
-          }}
         >
           {selectedOption ? (
             options.find((option) => option === selectedOption)
           ) : (
             <span className="text-muted-foreground">{selectPlaceholder}</span>
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronDown className="ml-2 size-4 shrink-0 opacity-30" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" style={{ width: width }}>
+      <PopoverContent className="p-0">
         <VirtualizedCommand
-          height={height}
           options={options.map((option) => ({ value: option, label: option }))}
           placeholder={searchPlaceholder}
           selectedOption={selectedOption}

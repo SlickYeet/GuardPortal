@@ -2,6 +2,7 @@
 
 import { readFile } from "fs/promises"
 import path from "path"
+import { type Configuration } from "@prisma/client"
 import { headers } from "next/headers"
 import { z } from "zod"
 
@@ -139,6 +140,49 @@ export async function getAvailablePeerIPs() {
   }
 }
 
+export async function getAvailableConfigurations() {
+  try {
+    const requestOptions: RequestInit = {
+      method: "GET",
+      headers: {
+        "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+      },
+      redirect: "follow",
+    }
+
+    const response = await fetch(
+      `${env.WIREGUARD_API_ENDPOINT}/getWireguardConfigurations`,
+      requestOptions,
+    )
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch available configurations: ${response.statusText}`,
+      )
+    }
+
+    const json = await response.json()
+    if (!Array.isArray(json.data)) {
+      throw new Error("Unexpected response format")
+    }
+
+    return json.data.map((configuration: any) => ({
+      id: configuration.PublicKey,
+      name: configuration.Name,
+      address: configuration.Address,
+      listenPort: configuration.ListenPort || env.WIREGUARD_VPN_PORT,
+      publicKey: configuration.PublicKey,
+      privateKey: configuration.PrivateKey,
+    })) as Configuration[]
+  } catch (error) {
+    console.error("Error fetching available configurations:", error)
+    return Promise.reject({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred",
+    })
+  }
+}
+
 export async function getPeerConfigs() {
   try {
     const requestOptions: RequestInit = {
@@ -218,6 +262,7 @@ export async function getPeerConfigsFromDB() {
 export async function addPeerConfig(
   name: string,
   userId: string,
+  configurationName: string,
   ipAddress?: string,
 ) {
   try {
@@ -252,9 +297,8 @@ export async function addPeerConfig(
       }),
     }
 
-    // TODO: Add interface to add peer form
     const response = await fetch(
-      `${env.WIREGUARD_API_ENDPOINT}/addPeers/wg0`,
+      `${env.WIREGUARD_API_ENDPOINT}/addPeers/${configurationName}`,
       requestOptions,
     )
 

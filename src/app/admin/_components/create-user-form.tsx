@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { type Configuration } from "@prisma/client"
 import { Loader2, RefreshCw, UserPlus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -9,7 +10,10 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { createNewUser } from "@/actions/user"
-import { getAvailablePeerIPs } from "@/actions/wireguard"
+import {
+  getAvailableConfigurations,
+  getAvailablePeerIPs,
+} from "@/actions/wireguard"
 import { Hint } from "@/components/hint"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +26,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
 import { cn } from "@/lib/utils"
 import { UserSchema } from "@/schemas/user"
@@ -34,14 +44,19 @@ export function CreateUserForm() {
   const email = searchParams.get("email") || ""
 
   const [availableIps, setAvailableIps] = useState<string[]>([])
+  const [availableConfigurations, setAvailableConfigurations] = useState<
+    Configuration[]
+  >([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingIps, setIsLoadingIps] = useState(true)
+  const [isLoadingConfigurations, setIsLoadingConfigurations] = useState(true)
 
   const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
       name: "",
       email: "",
+      configurationName: "",
       ipAddress: "",
     },
   })
@@ -53,9 +68,10 @@ export function CreateUserForm() {
 
   useEffect(() => {
     loadAvailableIps()
+    loadAvailableConfigurations()
   }, [])
 
-  const loadAvailableIps = async () => {
+  async function loadAvailableIps() {
     setIsLoadingIps(true)
     try {
       const ipsObj = await getAvailablePeerIPs()
@@ -70,6 +86,21 @@ export function CreateUserForm() {
       })
     } finally {
       setIsLoadingIps(false)
+    }
+  }
+
+  async function loadAvailableConfigurations() {
+    setIsLoadingConfigurations(true)
+    try {
+      const configurations = await getAvailableConfigurations()
+      setAvailableConfigurations(configurations)
+    } catch (error) {
+      console.error("Error loading configurations:", error)
+      toast.error("Error", {
+        description: "Failed to load configurations",
+      })
+    } finally {
+      setIsLoadingConfigurations(false)
     }
   }
 
@@ -126,59 +157,114 @@ export function CreateUserForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="ipAddress"
-          render={({ field }) => (
-            <FormItem className="flex-1">
-              <FormLabel>
-                <p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-start">
+          <FormField
+            control={form.control}
+            name="ipAddress"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
                   IP Address{" "}
                   <span className="text-muted-foreground">(Optional)</span>
-                </p>
-              </FormLabel>
-              <div className="flex items-center justify-between">
-                <FormControl>
-                  <VirtualizedCombobox
-                    options={availableIps}
-                    value={field.value}
-                    onSelectOption={(value) => {
-                      field.onChange(value)
-                    }}
-                    selectPlaceholder={
-                      isLoadingIps
-                        ? "Loading IP addresses"
-                        : "Select an IP address"
-                    }
-                    searchPlaceholder="Search IP addresses..."
-                    width="calc(100% - 50px)"
-                    height="200px"
-                  />
-                </FormControl>
-                <Hint label="Refresh IPs" asChild>
-                  <Button
-                    type="button"
-                    disabled={isLoadingIps}
-                    onClick={loadAvailableIps}
-                    size="icon"
-                    variant="outline"
-                  >
-                    <RefreshCw
-                      className={cn(
-                        "size-4",
-                        isLoadingIps ? "animate-spin" : "",
-                      )}
+                </FormLabel>
+                <div className="flex items-center justify-between gap-4">
+                  <FormControl className="w-full">
+                    <VirtualizedCombobox
+                      options={availableIps}
+                      value={field.value}
+                      onSelectOption={(value) => {
+                        field.onChange(value)
+                      }}
+                      selectPlaceholder={
+                        isLoadingIps
+                          ? "Loading IP addresses"
+                          : "Select an IP address"
+                      }
+                      searchPlaceholder="Search IP addresses..."
+                      className="w-[calc(100%-52px)]"
                     />
-                  </Button>
-                </Hint>
-              </div>
-              <FormDescription>
-                If left blank, a random IP will be assigned.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  </FormControl>
+                  <Hint label="Refresh IPs" asChild>
+                    <Button
+                      type="button"
+                      disabled={isLoadingIps}
+                      onClick={loadAvailableIps}
+                      tabIndex={-1}
+                      size="icon"
+                      variant="outline"
+                    >
+                      <RefreshCw
+                        className={cn(
+                          "size-4",
+                          isLoadingIps ? "animate-spin" : "",
+                        )}
+                      />
+                    </Button>
+                  </Hint>
+                </div>
+                <FormDescription>
+                  If left blank, a random IP will be assigned.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="configurationName"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Configuration Name</FormLabel>
+                <div className="flex items-center justify-between gap-4">
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            isLoadingConfigurations
+                              ? "Loading configurations..."
+                              : "Select a configuration"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableConfigurations.map((configuration) => (
+                        <SelectItem
+                          key={configuration.name}
+                          value={configuration.name}
+                        >
+                          {configuration.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Hint label="Refresh Configurations" asChild>
+                    <Button
+                      type="button"
+                      disabled={isLoadingConfigurations}
+                      onClick={loadAvailableConfigurations}
+                      tabIndex={-1}
+                      size="icon"
+                      variant="outline"
+                    >
+                      <RefreshCw
+                        className={cn(
+                          "size-4",
+                          isLoadingConfigurations ? "animate-spin" : "",
+                        )}
+                      />
+                    </Button>
+                  </Hint>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button type="submit" disabled={isLoading} size="lg" className="w-full">
           {isLoading ? (

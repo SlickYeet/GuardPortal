@@ -101,6 +101,7 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
     const wireguardConfig = await addPeerConfig(
       validatedData.name,
       newUser.user.id,
+      validatedData.configurationName,
       validatedData.ipAddress,
     )
 

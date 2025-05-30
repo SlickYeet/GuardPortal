@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { type Configuration } from "@prisma/client"
 import { FilePlus2, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -9,7 +10,10 @@ import { z } from "zod"
 
 import { createPeerConfig } from "@/actions/config"
 import { getUsers } from "@/actions/user"
-import { getAvailablePeerIPs } from "@/actions/wireguard"
+import {
+  getAvailableConfigurations,
+  getAvailablePeerIPs,
+} from "@/actions/wireguard"
 import { Hint } from "@/components/hint"
 import {
   Accordion,
@@ -39,7 +43,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
 import { cn } from "@/lib/utils"
 import { ConfigSchema } from "@/schemas/config"
-import { User } from "@/types"
+import type { User } from "@/types"
 
 export function CreateConfigForm({
   defaultConfig,
@@ -48,9 +52,13 @@ export function CreateConfigForm({
 }) {
   const [users, setUsers] = useState<User[]>([])
   const [availableIps, setAvailableIps] = useState<string[]>([])
+  const [availableConfigurations, setAvailableConfigurations] = useState<
+    Configuration[]
+  >([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
   const [isLoadingIps, setIsLoadingIps] = useState(true)
+  const [isLoadingConfigurations, setIsLoadingConfigurations] = useState(true)
 
   const form = useForm<z.infer<typeof ConfigSchema>>({
     resolver: zodResolver(ConfigSchema),
@@ -58,6 +66,7 @@ export function CreateConfigForm({
       name: "",
       content: "",
       userId: "",
+      configurationName: "",
       ipAddress: "",
     },
   })
@@ -83,6 +92,7 @@ export function CreateConfigForm({
 
   useEffect(() => {
     loadAvailableIps()
+    loadAvailableConfigurations()
   }, [])
 
   async function loadAvailableIps() {
@@ -100,6 +110,21 @@ export function CreateConfigForm({
       })
     } finally {
       setIsLoadingIps(false)
+    }
+  }
+
+  async function loadAvailableConfigurations() {
+    setIsLoadingConfigurations(true)
+    try {
+      const configurations = await getAvailableConfigurations()
+      setAvailableConfigurations(configurations)
+    } catch (error) {
+      console.error("Error loading configurations:", error)
+      toast.error("Error", {
+        description: "Failed to load configurations",
+      })
+    } finally {
+      setIsLoadingConfigurations(false)
     }
   }
 
@@ -144,53 +169,48 @@ export function CreateConfigForm({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="userId"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Select User</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  {isLoadingUsers ? (
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Loading users..." />
+                    </SelectTrigger>
+                  ) : (
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a user" />
+                    </SelectTrigger>
+                  )}
+                </FormControl>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name} ({user.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="flex flex-col gap-4 md:flex-row md:items-start">
-          <FormField
-            control={form.control}
-            name="userId"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>Select User</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    {isLoadingUsers ? (
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Loading users..." />
-                      </SelectTrigger>
-                    ) : (
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
-                    )}
-                  </FormControl>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name} ({user.email})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="ipAddress"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>
-                  <p>
-                    IP Address{" "}
-                    <span className="text-muted-foreground">(Optional)</span>
-                  </p>
+                  IP Address{" "}
+                  <span className="text-muted-foreground">(Optional)</span>
                 </FormLabel>
-                <div className="flex items-center justify-between">
-                  <FormControl>
+                <div className="flex items-center justify-between gap-4">
+                  <FormControl className="w-full">
                     <VirtualizedCombobox
                       options={availableIps}
                       value={field.value}
@@ -203,8 +223,7 @@ export function CreateConfigForm({
                           : "Select an IP address"
                       }
                       searchPlaceholder="Search IP addresses..."
-                      width="calc(100% - 50px)"
-                      height="200px"
+                      className="w-[calc(100%-52px)]"
                     />
                   </FormControl>
                   <Hint label="Refresh IPs" asChild>
@@ -212,6 +231,7 @@ export function CreateConfigForm({
                       type="button"
                       disabled={isLoadingIps}
                       onClick={loadAvailableIps}
+                      tabIndex={-1}
                       size="icon"
                       variant="outline"
                     >
@@ -231,7 +251,63 @@ export function CreateConfigForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="configurationName"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Configuration Name</FormLabel>
+                <div className="flex items-center justify-between gap-4">
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            isLoadingConfigurations
+                              ? "Loading configurations..."
+                              : "Select a configuration"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableConfigurations.map((configuration) => (
+                        <SelectItem
+                          key={configuration.name}
+                          value={configuration.name}
+                        >
+                          {configuration.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Hint label="Refresh Configurations" asChild>
+                    <Button
+                      type="button"
+                      disabled={isLoadingConfigurations}
+                      onClick={loadAvailableConfigurations}
+                      tabIndex={-1}
+                      size="icon"
+                      variant="outline"
+                    >
+                      <RefreshCw
+                        className={cn(
+                          "size-4",
+                          isLoadingConfigurations ? "animate-spin" : "",
+                        )}
+                      />
+                    </Button>
+                  </Hint>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+
         <Accordion type="single" collapsible>
           <AccordionItem value="content">
             <AccordionTrigger>

@@ -4,6 +4,7 @@ export const ConfigSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters long"),
   content: z.string(),
   userId: z.string().min(1, "User is required"),
+  configurationName: z.string().nonempty("Configuration name is required"),
   ipAddress: z
     .string()
     .optional()
