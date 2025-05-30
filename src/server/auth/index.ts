@@ -12,10 +12,25 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    autoSignIn: true,
   },
   user: {
     deleteUser: {
       enabled: true,
+    },
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "user",
+        input: false,
+      },
+      isFirstLogin: {
+        type: "boolean",
+        required: true,
+        defaultValue: true,
+        input: false,
+      },
     },
   },
 

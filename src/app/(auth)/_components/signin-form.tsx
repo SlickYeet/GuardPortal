@@ -39,8 +39,8 @@ export function SignInForm() {
   const onSubmit = async (values: z.infer<typeof SignInSchema>) => {
     const result = await signIn(values)
 
-    if (result.error) {
-      form.setError("root", { message: result.error })
+    if (result.message) {
+      form.setError("root", { message: result.message })
     }
   }
 

@@ -11,7 +11,6 @@ import {
   Loader2,
   Save,
 } from "lucide-react"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -86,11 +85,6 @@ export function EditAccessRequest({
   request,
   loadAccessRequests,
 }: EditAccessRequestProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [status, setStatus] = useState<AccessRequestStatus | undefined>(
-    undefined,
-  )
-
   const form = useForm<z.infer<typeof UpdateAccessRequestSchema>>({
     resolver: zodResolver(UpdateAccessRequestSchema),
     defaultValues: {
@@ -102,14 +96,13 @@ export function EditAccessRequest({
   async function handleSubmit(
     values: z.infer<typeof UpdateAccessRequestSchema>,
   ) {
-    if (status === values.status) return
+    if (request.status === values.status) return
 
     try {
       await updateAccessRequest(values)
       toast.success("Success", {
         description: `Access request has been ${values.status === "PENDING" ? "set to Pending" : values.status}.`,
       })
-      setStatus(values.status)
       loadAccessRequests()
     } catch (error) {
       console.error("Failed to change status:", error)
@@ -127,12 +120,7 @@ export function EditAccessRequest({
     <Dialog>
       <Hint label="Edit Request" asChild>
         <DialogTrigger asChild>
-          <Button
-            disabled={isOpen}
-            onClick={(prev) => setIsOpen(!prev)}
-            size="icon"
-            variant="outline"
-          >
+          <Button size="icon" variant="outline">
             <Edit className="size-4" />
             <span className="sr-only">Edit Access Request</span>
           </Button>

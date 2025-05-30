@@ -53,12 +53,14 @@ export function RequestAccessForm() {
         description: `${response.message || "Unknown error"}`,
         duration: 5000,
       })
-      form.setError("email", {
-        type: "manual",
-        message:
-          response.message || "An error occurred while sending your request.",
-      })
-      setisError(true)
+      if (response.key === "EMAIL_EXISTS") {
+        form.setError("email", {
+          type: "manual",
+          message:
+            response.message || "An error occurred while sending your request.",
+        })
+        setisError(true)
+      }
       return
     }
 
@@ -157,14 +159,14 @@ export function RequestAccessForm() {
               <Button
                 onClick={() => {
                   setisError(false)
-                  form.reset()
+                  form.setValue("email", "")
                 }}
                 size="lg"
                 variant="destructive"
                 className="w-full"
               >
                 <RefreshCcw className="size-4" />
-                <span>An error occurred. Click to reset.</span>
+                <span>An error occurred. Click to try again.</span>
               </Button>
             )}
           </form>

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Plus, RefreshCw } from "lucide-react"
+import { Loader2, RefreshCw, UserPlus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -75,9 +75,7 @@ export function CreateUserForm() {
     try {
       const result = await createNewUser(values)
       if (result.success) {
-        toast.success("User created successfully", {
-          description: `Temporary password: ${result.tempPassword}`,
-        })
+        toast.success("User created successfully")
         reset()
         router.push("/admin?tab=create-user")
         loadAvailableIps()
@@ -162,7 +160,7 @@ export function CreateUserForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button type="submit" disabled={isLoading} size="lg" className="w-full">
         {isLoading ? (
           <>
             <Loader2 className="size-4 animate-spin" />
@@ -170,7 +168,7 @@ export function CreateUserForm() {
           </>
         ) : (
           <>
-            <Plus className="size-4" />
+            <UserPlus className="size-4" />
             <span>Create User</span>
           </>
         )}

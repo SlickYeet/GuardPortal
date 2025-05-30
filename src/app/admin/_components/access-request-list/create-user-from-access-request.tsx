@@ -23,13 +23,24 @@ export function CreateUserFromAccessRequest({
     router.push(href)
   }
 
-  return (
+  return request.status === "APPROVED" ? (
     <Hint label="Create user from access request" asChild>
       <Button
         disabled={request.status !== "APPROVED"}
         onClick={handleRouteChange}
         size="icon"
         variant="outline"
+      >
+        <UserPlus className="size-4" />
+        <span className="sr-only">Create user from access request</span>
+      </Button>
+    </Hint>
+  ) : (
+    <Hint label="Request not approved" asChild>
+      <Button
+        size="icon"
+        variant="outline"
+        className="cursor-not-allowed opacity-50"
       >
         <UserPlus className="size-4" />
         <span className="sr-only">Create user from access request</span>

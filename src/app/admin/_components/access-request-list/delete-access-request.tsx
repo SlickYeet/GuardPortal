@@ -1,7 +1,6 @@
 "use client"
 
 import { Loader2, Trash2 } from "lucide-react"
-import { useState } from "react"
 
 import { Hint } from "@/components/hint"
 import {
@@ -26,18 +25,11 @@ export function DeleteAccessRequest({
   isDeleting,
   handleDeleteAccessRequest,
 }: DeleteAccessRequestProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog>
       <Hint label="Delete Access Request" asChild>
         <AlertDialogTrigger asChild>
-          <Button
-            disabled={isOpen}
-            onClick={() => setIsOpen(true)}
-            size="icon"
-            variant="destructive"
-          >
+          <Button size="icon" variant="destructive">
             <Trash2 className="size-4" />
             <span className="sr-only">Delete Access Request</span>
           </Button>

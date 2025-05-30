@@ -20,19 +20,19 @@ export function AdminTabs({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const getTabFromParams = () => {
+  const getTabFromParams = useCallback(() => {
     const urlTab = searchParams.get("tab")
     return validTabs.includes(urlTab as TabValue)
       ? (urlTab as TabValue)
       : "create-user"
-  }
+  }, [searchParams])
 
   const [activeTab, setActiveTab] = useState<TabValue>(getTabFromParams)
 
   useEffect(() => {
     const tab = getTabFromParams()
     setActiveTab(tab)
-  }, [searchParams])
+  }, [getTabFromParams])
 
   const createQueryString = useCallback(
     (name: string, value: string) => {

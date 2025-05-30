@@ -1,114 +1,125 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id            String      @id
-    name          String
-    email         String
-    emailVerified Boolean
-    image         String?     @default("https://gravatar.com/avatar/HASH")
-    role          String?     @default("user")
-    banned        Boolean?
-    banReason     String?
-    banExpires    DateTime?
-    isFirstLogin  Boolean?    @default(true)
-    createdAt     DateTime
-    updatedAt     DateTime
-    sessions      Session[]
-    accounts      Account[]
-    config        PeerConfig?
+  id            String      @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?     @default("https://gravatar.com/avatar/HASH")
+  role          String      @db.Text
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+  isFirstLogin  Boolean
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  config        PeerConfig?
 
-    @@unique([email])
-    @@map("user")
+  @@unique([email])
+  @@map("user")
 }
 
 model Session {
-    id             String   @id
-    expiresAt      DateTime
-    token          String
-    createdAt      DateTime
-    updatedAt      DateTime
-    ipAddress      String?
-    userAgent      String?
-    impersonatedBy String?
-    userId         String
-    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([token])
-    @@map("session")
+  @@unique([token])
+  @@map("session")
+}
+
+model Verification {
+  id         String    @id
+  identifier String    @db.Text
+  value      String    @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
 
 model Account {
-    id                    String    @id
-    accountId             String
-    providerId            String
-    userId                String
-    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    accessToken           String?
-    refreshToken          String?
-    idToken               String?
-    accessTokenExpiresAt  DateTime?
-    refreshTokenExpiresAt DateTime?
-    scope                 String?
-    password              String?
-    createdAt             DateTime
-    updatedAt             DateTime
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
 
-    @@map("account")
+  @@map("account")
 }
 
 enum AccessRequestStatus {
-    PENDING
-    APPROVED
-    REJECTED
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model AccessRequest {
-    id        String              @id @default(cuid())
-    name      String
-    email     String              @unique
-    reason    String?
-    status    AccessRequestStatus @default(PENDING)
-    createdAt DateTime            @default(now())
-    updatedAt DateTime            @updatedAt
+  id        String              @id @default(cuid())
+  name      String
+  email     String              @unique
+  reason    String?
+  status    AccessRequestStatus @default(PENDING)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 }
 
 model PeerConfig {
-    id                String  @id @default(cuid())
-    name              String
-    publicKey         String
-    privateKey        String
-    allowedIPs        String
-    endpoint          String
-    endpointAllowedIP String
-    dns               String
-    preSharedKey      String?
-    mtu               Int?    @default(1420)
-    keepAlive         Int?    @default(21)
+  id                String  @id @default(cuid())
+  name              String
+  publicKey         String
+  privateKey        String
+  allowedIPs        String
+  endpoint          String
+  endpointAllowedIP String
+  dns               String
+  preSharedKey      String?
+  mtu               Int?    @default(1420)
+  keepAlive         Int?    @default(21)
 
-    configurationId String
-    configuration   Configuration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+  configurationId String
+  configuration   Configuration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
 
-    userId String? @unique
-    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Configuration {
-    id         String @id @default(cuid())
-    name       String
-    address    String
-    listenPort String
-    publicKey  String
-    privateKey String
+  id         String @id @default(cuid())
+  name       String
+  address    String
+  listenPort String
+  publicKey  String
+  privateKey String
 
-    PeerConfig PeerConfig[]
+  PeerConfig PeerConfig[]
 }

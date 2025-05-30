@@ -1,16 +1,59 @@
 "use server"
 
-import { hash } from "bcryptjs"
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { sendEmail } from "@/actions/email"
 import { addPeerConfig, deletePeerConfig } from "@/actions/wireguard"
+import { env } from "@/env"
 import { generateTemporaryPassword } from "@/lib/password"
-import { FirstTimeLoginSchema } from "@/schemas/auth"
-import { UserSchema } from "@/schemas/user"
+import { FirstTimeLoginSchema, SignUpSchema } from "@/schemas/auth"
+import {
+  DeleteUserSchema,
+  ResetUserPasswordSchema,
+  UserSchema,
+} from "@/schemas/user"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
+
+export async function createFirstUserAsAdmin(
+  values: z.infer<typeof SignUpSchema>,
+) {
+  const name = values.name || env.ADMIN_NAME
+  const email = values.email || env.ADMIN_EMAIL
+  const password = values.password || env.ADMIN_PASSWORD
+
+  const res = await auth.api.signUpEmail({
+    body: {
+      name,
+      email,
+      password,
+    },
+    asResponse: true,
+  })
+
+  if (!res.ok) {
+    const errorMessage = await res.text()
+    console.error("Error creating first user:", errorMessage)
+    return {
+      success: false,
+      message: errorMessage,
+    }
+  }
+
+  await db.user.update({
+    where: { email },
+    data: {
+      emailVerified: true,
+      isFirstLogin: false,
+      role: "admin",
+    },
+  })
+
+  revalidatePath("/vpn")
+  return redirect("/vpn")
+}
 
 export async function createNewUser(values: z.infer<typeof UserSchema>) {
   try {
@@ -29,13 +72,12 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
     }
 
     const tempPassword = generateTemporaryPassword()
-    const hashedPassword = await hash(tempPassword, 12)
 
     const newUser = await auth.api.createUser({
       body: {
         name: validatedData.name,
         email: validatedData.email,
-        password: hashedPassword,
+        password: tempPassword,
       },
     })
 
@@ -52,7 +94,7 @@ export async function createNewUser(values: z.infer<typeof UserSchema>) {
       template: "new-user",
       data: {
         email: validatedData.email,
-        password: hashedPassword,
+        password: tempPassword,
       },
     })
 
@@ -147,10 +189,10 @@ export async function getUsers() {
   }
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteUser(values: z.infer<typeof DeleteUserSchema>) {
   try {
     const existingUser = await db.user.findUnique({
-      where: { id: userId },
+      where: { id: values.userId },
       select: {
         id: true,
         config: {
@@ -184,7 +226,7 @@ export async function deleteUser(userId: string) {
     }
 
     await db.user.delete({
-      where: { id: userId },
+      where: { id: values.userId },
     })
 
     return {
@@ -200,19 +242,23 @@ export async function deleteUser(userId: string) {
   }
 }
 
-export async function resetUserPassword(userId: string) {
+export async function resetUserPassword(
+  values: z.infer<typeof ResetUserPasswordSchema>,
+) {
   try {
+    const ctx = await auth.$context
     const tempPassword = generateTemporaryPassword()
-    const hashedPassword = await hash(tempPassword, 12)
+    const hashedPassword = await ctx.password.hash(tempPassword)
 
     const user = await db.user.findUnique({
-      where: { id: userId },
+      where: { id: values.userId },
       select: {
         email: true,
         accounts: {
           select: {
             id: true,
             providerId: true,
+            password: true,
           },
         },
       },
@@ -244,15 +290,9 @@ export async function resetUserPassword(userId: string) {
     }
 
     await db.user.update({
-      where: { id: userId },
+      where: { id: values.userId },
       data: {
         isFirstLogin: true,
-      },
-    })
-
-    await auth.api.revokeUserSessions({
-      body: {
-        userId,
       },
     })
 
@@ -268,7 +308,6 @@ export async function resetUserPassword(userId: string) {
 
     return {
       success: true,
-      tempPassword,
     }
   } catch (error) {
     console.error("Error resetting user password:", error)
@@ -284,8 +323,9 @@ export async function updateUserPasswordAndVerifyEmail(
   values: z.infer<typeof FirstTimeLoginSchema>,
 ) {
   try {
+    const ctx = await auth.$context
     const validatedData = FirstTimeLoginSchema.parse(values)
-    const hashedPassword = await hash(validatedData.password, 12)
+    const hashedPassword = await ctx.password.hash(validatedData.password)
 
     const user = await db.user.findUnique({
       where: {
@@ -327,8 +367,12 @@ export async function updateUserPasswordAndVerifyEmail(
           isFirstLogin: false,
           accounts: {
             update: {
-              where: { id: account.id },
-              data: { password: hashedPassword },
+              where: {
+                id: account.id,
+              },
+              data: {
+                password: hashedPassword,
+              },
             },
           },
         },

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Plus, RefreshCw } from "lucide-react"
+import { FilePlus2, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -268,8 +268,8 @@ export function CreateConfigForm({
           </AccordionItem>
         </Accordion>
 
-        <Button type="submit" disabled={isLoading} size="lg">
-          <Plus className="size-4" />
+        <Button type="submit" disabled={isLoading} size="lg" className="w-full">
+          <FilePlus2 className="size-4" />
           Create Config
         </Button>
       </form>

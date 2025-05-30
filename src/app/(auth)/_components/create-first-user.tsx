@@ -5,7 +5,7 @@ import { Loader2, LogIn } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { createFirstUserAsAdmin } from "@/actions/auth"
+import { createFirstUserAsAdmin } from "@/actions/user"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -26,9 +26,8 @@ export function CreateFirstUser() {
 
   const onSubmit = async (values: z.infer<typeof SignUpSchema>) => {
     const result = await createFirstUserAsAdmin(values)
-
-    if (result.error) {
-      form.setError("root", { message: result.error })
+    if (result.message) {
+      form.setError("root", { message: result.message })
     }
   }
 

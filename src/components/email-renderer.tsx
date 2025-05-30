@@ -25,7 +25,7 @@ const emails: Record<
         <p>Your account has been created successfully!</p>
         <p>
           Click
-          <a href={env.NEXT_PUBLIC_URL}> here</a>
+          <a href={env.NEXT_PUBLIC_URL}> here </a>
           to log in to your account
         </p>
       </div>

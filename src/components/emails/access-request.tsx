@@ -26,8 +26,17 @@ export function AccessRequestEmail(props: {
     body = (
       <>
         <p>Your request to access HHN VPN has been approved.</p>
-        <p>You can now use the VPN service.</p>
-        <a href={env.NEXT_PUBLIC_URL}>Click here to access the VPN</a>
+        <p>
+          You will receive further instructions on how to access the VPN
+          shortly.
+        </p>
+        <p>
+          If you have any questions, please reach out at{" "}
+          <a href={`mailto:${env.NEXT_PUBLIC_CONTACT_EMAIL}`}>
+            {env.NEXT_PUBLIC_CONTACT_EMAIL}
+          </a>
+          .
+        </p>
         <p>Thank you for your request.</p>
       </>
     )

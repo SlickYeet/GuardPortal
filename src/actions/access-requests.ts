@@ -17,23 +17,26 @@ export async function createRequestAccess(
 ): Promise<{
   success: boolean
   message?: string
+  key?: string
   data?: Record<string, string>
 }> {
   try {
     const ip = ((await headers()).get("x-forwarded-for") ?? "127.0.0.1")
       .split(",")[0]
       .trim()
-    const { success, remaining } = await rateLimiter({
+    const { success, remaining, limit, reset } = await rateLimiter({
       ip,
-      limit: 1,
-      duration: 60 * 1000 * 5, // 5 minutes
+      limit: 2,
+      window: 60 * 1000 * 5, // 5 minutes
     })
     if (!success) {
+      const waitMs = reset ? reset - Date.now() : 5 * 60 * 1000
+      const waitSeconds = Math.ceil(waitMs / 1000)
+      const waitMinutes = Math.floor(waitSeconds / 60)
+      const waitRemainderSeconds = waitSeconds % 60
       return {
         success: false,
-        message: `Rate limit exceeded. Try again in ${Math.ceil(
-          remaining / 1000,
-        )} seconds.`,
+        message: `You have reached the maximum of ${limit} request(s). Please wait ${waitMinutes} minute(s)${waitRemainderSeconds ? ` and ${waitRemainderSeconds} seconds` : ""} before trying again. You have ${remaining} request(s) remaining in this period.`,
       }
     }
 
@@ -45,6 +48,7 @@ export async function createRequestAccess(
       return {
         success: false,
         message: "An access request for this email already exists.",
+        key: "EMAIL_EXISTS",
       }
     }
 
@@ -56,6 +60,7 @@ export async function createRequestAccess(
       return {
         success: false,
         message: "An account with this email already exists.",
+        key: "EMAIL_EXISTS",
       }
     }
 
@@ -147,24 +152,16 @@ export async function updateAccessRequest(
     if (!existingRequest) {
       throw new Error("Access request not found")
     }
+    if (existingRequest.status === values.status) {
+      return existingRequest
+    }
 
     const updatedRequest = await db.accessRequest.update({
       where: { id: values.id },
       data: { status: values.status },
-      select: {
-        name: true,
-        email: true,
-        reason: true,
-        status: true,
-      },
     })
-
     if (!updatedRequest) {
       throw new Error("Access request not found")
-    }
-
-    if (updatedRequest.status === values.status) {
-      return updatedRequest
     }
 
     const templateName =
