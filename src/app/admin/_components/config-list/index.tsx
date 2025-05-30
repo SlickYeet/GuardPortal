@@ -124,6 +124,7 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
                 <TableHead>Server</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>DNS</TableHead>
+                <TableHead>Configuration</TableHead>
                 <TableHead>Assignee</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -137,6 +138,9 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
                   <TableCell>{`${config.endpoint}` || "N/A"}</TableCell>
                   <TableCell>{config.allowedIPs || "N/A"}</TableCell>
                   <TableCell>{config.dns || "N/A"}</TableCell>
+                  <TableCell>
+                    {config.configuration.name || "No configuration"}
+                  </TableCell>
                   {config.user ? (
                     <AssigneeDetails user={config.user} />
                   ) : (
