@@ -3,6 +3,7 @@
 import { Edit } from "lucide-react"
 import Link from "next/link"
 
+import { Hint } from "@/components/hint"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -35,13 +36,8 @@ export function AssigneeDetails({ user }: AssigneeDetailsProps) {
     return (
       <TableCell>
         <Drawer>
-          <DrawerTrigger asChild>
-            <Avatar>
-              <AvatarImage src={user.image} />
-              <AvatarFallback>
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
+          <DrawerTrigger>
+            <Trigger user={user} />
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
@@ -62,19 +58,25 @@ export function AssigneeDetails({ user }: AssigneeDetailsProps) {
   return (
     <TableCell>
       <HoverCard openDelay={100}>
-        <HoverCardTrigger asChild>
-          <Avatar>
-            <AvatarImage src={user.image} />
-            <AvatarFallback>
-              {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-            </AvatarFallback>
-          </Avatar>
+        <HoverCardTrigger>
+          <Trigger user={user} />
         </HoverCardTrigger>
         <HoverCardContent>
           <UserDetails user={user} />
         </HoverCardContent>
       </HoverCard>
     </TableCell>
+  )
+}
+
+function Trigger({ user }: { user: User }) {
+  return (
+    <Avatar>
+      <AvatarImage src={user.image} />
+      <AvatarFallback>
+        {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+      </AvatarFallback>
+    </Avatar>
   )
 }
 
@@ -93,12 +95,14 @@ function UserDetails({ user, className }: { user: User; className?: string }) {
           {user.email || "No email provided"}
         </p>
       </div>
-      <Button size="icon" variant="outline" asChild>
-        <Link href="/admin?tab=manage-users" className="ml-auto">
-          <Edit className="size-4" />
-          <span className="sr-only">Edit User</span>
-        </Link>
-      </Button>
+      <Hint label="Manage User" asChild>
+        <Button size="icon" variant="outline" asChild>
+          <Link href="/admin?tab=manage-users" className="ml-auto">
+            <Edit className="size-4" />
+            <span className="sr-only">Edit User</span>
+          </Link>
+        </Button>
+      </Hint>
     </div>
   )
 }
