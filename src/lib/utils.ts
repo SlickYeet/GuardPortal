@@ -13,6 +13,15 @@ export function isUserAdmin(user?: User) {
   return user?.email?.toLowerCase() === adminEmail?.toLowerCase()
 }
 
+export function formatConfigName(name: string): string {
+  if (name.startsWith("dev:") || name.startsWith("prod:")) {
+    return name
+  }
+  const suffix = "'s Config"
+  const baseName = name.endsWith(suffix) ? name : `${name}${suffix}`
+  return env.NODE_ENV === "production" ? `prod:${baseName}` : `dev:${baseName}`
+}
+
 export function parseConfigName(name: string): string {
   return name.replace("dev:", "").replace("prod:", "")
 }

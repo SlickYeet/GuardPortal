@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
-import { cn } from "@/lib/utils"
+import { cn, parseConfigName } from "@/lib/utils"
 import { ConfigUpdateSchema } from "@/schemas/config"
 import type { PeerConfigWithUser, User } from "@/types"
 
@@ -112,12 +112,14 @@ export function EditConfigDialog({
     }
   }
 
+  const configName = parseConfigName(initConfig.name)
+
   const form = useForm<Partial<z.infer<typeof ConfigUpdateSchema>>>({
     defaultValues: {
-      id: initConfig.id || "",
-      name: initConfig?.name || "",
-      userId: initConfig?.user.id || "",
-      ipAddress: initConfig?.allowedIPs || "",
+      id: initConfig.id,
+      name: configName,
+      userId: initConfig?.user.id,
+      ipAddress: initConfig?.allowedIPs,
       content: "",
     },
   })

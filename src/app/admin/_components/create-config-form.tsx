@@ -8,9 +8,9 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { createPeerConfig } from "@/actions/config"
 import { getUsers } from "@/actions/user"
 import {
+  createPeerConfig,
   getAvailableConfigurations,
   getAvailablePeerIPs,
 } from "@/actions/wireguard"

@@ -7,11 +7,12 @@ import { headers } from "next/headers"
 import { z } from "zod"
 
 import { env } from "@/env"
+import { formatConfigName } from "@/lib/utils"
 import {
   parsePeerConfig,
   type PeerConfigWithConfiguration,
 } from "@/lib/wireguard"
-import { ConfigUpdateSchema } from "@/schemas/config"
+import { ConfigSchema, ConfigUpdateSchema } from "@/schemas/config"
 import { auth } from "@/server/auth"
 import { db } from "@/server/db"
 
@@ -188,6 +189,83 @@ export async function getAvailableConfigurations() {
       message:
         error instanceof Error ? error.message : "Unknown error occurred",
     })
+  }
+}
+
+export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
+  try {
+    const validatedData = ConfigSchema.parse(values)
+
+    const existingConfig = await db.peerConfig.count({
+      where: { userId: values.userId },
+    })
+    if (existingConfig > 0) {
+      return {
+        success: false,
+        message: "A peer config already exists for this user.",
+      }
+    }
+
+    const formattedName = formatConfigName(validatedData.name)
+
+    const wireguardConfig = await addPeerConfig(
+      formattedName,
+      validatedData.userId,
+      validatedData.configurationName,
+      validatedData.ipAddress,
+    )
+
+    const result = await db.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: validatedData.userId },
+      })
+
+      if (!user) {
+        throw new Error("User not found after creation.")
+      }
+
+      const config = await tx.peerConfig.create({
+        data: {
+          name: formattedName,
+          publicKey: wireguardConfig.publicKey,
+          privateKey: wireguardConfig.privateKey,
+          allowedIPs: wireguardConfig.allowedIPs,
+          endpoint: wireguardConfig.endpoint,
+          endpointAllowedIP: wireguardConfig.endpointAllowedIP,
+          dns: wireguardConfig.dns,
+          preSharedKey: wireguardConfig.preSharedKey,
+          mtu: wireguardConfig.mtu,
+          keepAlive: wireguardConfig.keepAlive,
+          configuration: {
+            create: {
+              name: wireguardConfig.configuration.name,
+              address: wireguardConfig.configuration.address,
+              listenPort: wireguardConfig.configuration.listenPort,
+              publicKey: wireguardConfig.configuration.publicKey,
+              privateKey: wireguardConfig.configuration.privateKey,
+            },
+          },
+          user: {
+            connect: {
+              id: validatedData.userId,
+            },
+          },
+        },
+      })
+
+      return config
+    })
+
+    return {
+      success: true,
+      name: result.name,
+    }
+  } catch (error) {
+    console.error("Error creating peer config:", error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error",
+    }
   }
 }
 
@@ -407,7 +485,8 @@ export async function updatePeerConfig(
   })
   const currentUserId = session?.user.id
 
-  const { id, name, userId, ipAddress, content } = values
+  const { id, name, userId, ipAddress, content } =
+    ConfigUpdateSchema.parse(values)
 
   if (!id || !userId || !currentUserId) {
     throw new Error("The config ID and userId must be provided to update")
@@ -441,6 +520,8 @@ export async function updatePeerConfig(
   const parseContent = z.string().parse(content)
   const rawConfig = parsePeerConfig(parseContent)
 
+  const formattedName = formatConfigName(name || existingConfig.name)
+
   const requestOptions: RequestInit = {
     method: "POST",
     headers: {
@@ -459,7 +540,7 @@ export async function updatePeerConfig(
         rawConfig.Address || existingConfig.endpointAllowedIP,
       keepalive: rawConfig.PersistentKeepalive || existingConfig.keepAlive,
       mtu: rawConfig.MTU || existingConfig.mtu,
-      name: name || rawConfig.Name || existingConfig.name,
+      name: formattedName,
       private_key: rawConfig.PrivateKey || existingConfig.privateKey,
       remote_endpoint:
         rawConfig.Endpoint ||
