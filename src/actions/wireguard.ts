@@ -116,7 +116,7 @@ export async function getAvailablePeerIPs() {
       redirect: "follow",
     }
 
-    // TODO: Require interface to be passed in
+    // TODO: Use {{server}}/api/ping/getAllPeersIpAddress and filter on the client on user selection
     const response = await fetch(
       `${env.WIREGUARD_API_ENDPOINT}/getAvailableIPs/wg0`,
       requestOptions,
@@ -193,7 +193,7 @@ export async function getPeerConfigs() {
       redirect: "follow",
     }
 
-    // TODO: Require interface to be passed in
+    // TODO: Use {{server}}/api/ping/getAllPeersIpAddress and filter on the client on user selection
     const response = await fetch(
       `${env.WIREGUARD_API_ENDPOINT}/downloadAllPeers/wg0`,
       requestOptions,
