@@ -3,6 +3,7 @@
 import { z } from "zod"
 
 import { addPeerConfig } from "@/actions/wireguard"
+import { env } from "@/env"
 import { ConfigSchema } from "@/schemas/config"
 import { db } from "@/server/db"
 
@@ -10,10 +11,25 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
   try {
     const validatedData = ConfigSchema.parse(values)
 
+    const existingConfig = await db.peerConfig.count({
+      where: { userId: values.userId },
+    })
+    if (existingConfig > 0) {
+      return {
+        success: false,
+        message: "A peer config already exists for this user.",
+      }
+    }
+
+    const formattedName =
+      env.NODE_ENV === "production"
+        ? `prod:${values.name}'s Config`
+        : `dev:${values.name}'s Config`
+
     const wireguardConfig = await addPeerConfig(
-      values.name,
-      values.userId,
-      values.ipAddress,
+      formattedName,
+      validatedData.userId,
+      validatedData.ipAddress,
     )
 
     const result = await db.$transaction(async (tx) => {
@@ -27,7 +43,7 @@ export async function createPeerConfig(values: z.infer<typeof ConfigSchema>) {
 
       const config = await tx.peerConfig.create({
         data: {
-          name: validatedData.name,
+          name: formattedName,
           publicKey: wireguardConfig.publicKey,
           privateKey: wireguardConfig.privateKey,
           allowedIPs: wireguardConfig.allowedIPs,

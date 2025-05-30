@@ -239,8 +239,6 @@ export async function addPeerConfig(
       )
     }
 
-    const configName = `${name}'s Config`
-
     const requestOptions: RequestInit = {
       method: "POST",
       headers: {
@@ -248,7 +246,7 @@ export async function addPeerConfig(
         "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
       },
       body: JSON.stringify({
-        name: configName,
+        name,
         ...(ipAddress ? { allowed_ips: [ipAddress] } : {}),
         endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
       }),
@@ -268,7 +266,7 @@ export async function addPeerConfig(
     const peer = Array.isArray(json.data) ? json.data[0] : json.data
 
     return {
-      name: configName,
+      name,
       userId: userId,
       publicKey: peer.id,
       privateKey: peer.private_key,
