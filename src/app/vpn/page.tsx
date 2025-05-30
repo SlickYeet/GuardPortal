@@ -125,7 +125,7 @@ export default async function VPNPage() {
   return (
     <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-8 flex flex-col gap-y-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-8 flex justify-between gap-x-4">
           <div>
             <h1 className="text-primary text-3xl font-bold">
               Your VPN Configuration

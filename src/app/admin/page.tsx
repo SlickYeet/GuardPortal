@@ -39,7 +39,7 @@ export default async function AdminPage() {
   return (
     <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between gap-x-4">
           <h1 className="mb-6 text-3xl font-bold">VPN Admin Dashboard</h1>
           <UserMenu user={currentUser} isAdmin={isAdmin} />
         </div>

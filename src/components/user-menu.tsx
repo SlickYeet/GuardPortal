@@ -40,7 +40,7 @@ export function UserMenu({ user, isAdmin = false }: UserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Avatar>
           <AvatarImage src={user.image || "https://gravatar.com/avatar/HASH"} />
           <AvatarFallback>
