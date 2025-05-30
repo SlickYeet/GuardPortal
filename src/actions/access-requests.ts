@@ -84,7 +84,7 @@ export async function createRequestAccess(
     await sendEmail({
       to: env.ADMIN_EMAIL,
       subject: "HHN VPN Access Request",
-      template: "request-access",
+      template: "access-request-to-admin",
       data: {
         name: accessRequest.name,
         email: accessRequest.email,
@@ -99,7 +99,6 @@ export async function createRequestAccess(
         name: accessRequest.name,
         email: accessRequest.email,
         reason: accessRequest.reason ?? "No reason provided",
-        status: accessRequest.status,
       },
     })
 
@@ -177,7 +176,6 @@ export async function updateAccessRequest(
         name: updatedRequest.name,
         email: updatedRequest.email,
         reason: updatedRequest.reason ?? "No reason provided",
-        status: updatedRequest.status,
       },
     })
 
