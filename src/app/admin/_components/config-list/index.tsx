@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { cn, parseConfigName } from "@/lib/utils"
 import { ConfigSchema } from "@/schemas/config"
 import type { PeerConfigWithUser } from "@/types"
 
@@ -133,7 +133,7 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
               {configs.map((config) => (
                 <TableRow key={config.id}>
                   <TableCell className="truncate font-medium">
-                    {config.name || "Unnamed Peer"}
+                    {parseConfigName(config.name) || "Unnamed Peer"}
                   </TableCell>
                   <TableCell>{`${config.endpoint}` || "N/A"}</TableCell>
                   <TableCell>{config.allowedIPs || "N/A"}</TableCell>

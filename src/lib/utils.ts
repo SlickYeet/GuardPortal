@@ -12,3 +12,7 @@ export function isUserAdmin(user?: User) {
   const adminEmail = env.ADMIN_EMAIL
   return user?.email?.toLowerCase() === adminEmail?.toLowerCase()
 }
+
+export function parseConfigName(name: string): string {
+  return name.replace("dev:", "").replace("prod:", "")
+}

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { UserMenu } from "@/components/user-menu"
-import { isUserAdmin } from "@/lib/utils"
+import { isUserAdmin, parseConfigName } from "@/lib/utils"
 import { auth } from "@/server/auth"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -55,9 +55,11 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   }
 
+  const configName = parseConfigName(config.name)
+
   return {
-    title: `${user.name || user.email} - ${config.name} VPN Configuration`,
-    description: `Your VPN configuration for ${config.name}. Scan the QR code or download the config file to set up your VPN.`,
+    title: `${configName} - ${user.name || user.email}'s VPN Configuration`,
+    description: `Your VPN configuration for ${configName}. Scan the QR code or download the config file to set up your VPN.`,
   }
 }
 
@@ -115,8 +117,10 @@ export default async function VPNPage() {
     )
   }
 
+  const configName = parseConfigName(wireguardConfig.name)
+
   const CONFIG_DETAILS = [
-    { label: "Name", value: wireguardConfig.name, icon: FileText },
+    { label: "Name", value: configName, icon: FileText },
     { label: "Server", value: wireguardConfig.endpoint, icon: Server },
     { label: "Allowed IPs", value: wireguardConfig.allowedIPs, icon: Globe },
     { label: "DNS", value: wireguardConfig.dns, icon: CloudCog },
