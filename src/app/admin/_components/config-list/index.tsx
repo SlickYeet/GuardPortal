@@ -10,13 +10,7 @@ import {
   getPeerConfigsFromDB,
   updatePeerConfig,
 } from "@/actions/wireguard"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
 import {
   Table,
   TableBody,
@@ -29,6 +23,7 @@ import { cn } from "@/lib/utils"
 import { ConfigSchema } from "@/schemas/config"
 import type { PeerConfigWithUser } from "@/types"
 
+import { AssigneeDetails } from "./assignee-details"
 import { DeleteConfigDialog } from "./delete-config-dialog"
 import { EditConfigDialog } from "./edit-config-dialog"
 
@@ -130,7 +125,7 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
                 <TableHead>IP Address</TableHead>
                 <TableHead>DNS</TableHead>
                 <TableHead>Assignee</TableHead>
-                <TableHead />
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -143,38 +138,7 @@ export function ConfigList({ defaultConfig }: { defaultConfig: string }) {
                   <TableCell>{config.allowedIPs || "N/A"}</TableCell>
                   <TableCell>{config.dns || "N/A"}</TableCell>
                   {config.user ? (
-                    <TableCell>
-                      <HoverCard openDelay={100}>
-                        <HoverCardTrigger asChild>
-                          <Avatar>
-                            <AvatarImage src={config.user.image} />
-                            <AvatarFallback>
-                              {config.user.name
-                                ? config.user.name.charAt(0).toUpperCase()
-                                : "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage src={config.user.image} />
-                            <AvatarFallback>
-                              {config.user.name
-                                ? config.user.name.charAt(0).toUpperCase()
-                                : "U"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="space-y-1">
-                            <p className="font-medium">
-                              {config.user.name || "Unknown User"}
-                            </p>
-                            <p className="text-muted-foreground text-sm">
-                              {config.user.email || "No email provided"}
-                            </p>
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                    </TableCell>
+                    <AssigneeDetails user={config.user} />
                   ) : (
                     <TableCell className="text-muted-foreground">
                       No user assigned
