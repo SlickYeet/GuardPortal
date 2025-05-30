@@ -227,6 +227,7 @@ export function CreateConfigForm({
                 <FormDescription>
                   If left blank, a random IP will be assigned.
                 </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />

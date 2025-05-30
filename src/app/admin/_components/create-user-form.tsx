@@ -10,7 +10,17 @@ import { z } from "zod"
 
 import { createNewUser } from "@/actions/user"
 import { getAvailablePeerIPs } from "@/actions/wireguard"
+import { Hint } from "@/components/hint"
 import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
@@ -27,14 +37,7 @@ export function CreateUserForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingIps, setIsLoadingIps] = useState(true)
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<z.infer<typeof UserSchema>>({
+  const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
       name: "",
@@ -44,9 +47,9 @@ export function CreateUserForm() {
   })
 
   useEffect(() => {
-    setValue("name", name)
-    setValue("email", email)
-  }, [name, email, setValue])
+    form.setValue("name", name)
+    form.setValue("email", email)
+  }, [name, email, form.setValue])
 
   useEffect(() => {
     loadAvailableIps()
@@ -76,7 +79,7 @@ export function CreateUserForm() {
       const result = await createNewUser(values)
       if (result.success) {
         toast.success("User created successfully")
-        reset()
+        form.reset()
         router.push("/admin?tab=create-user")
         loadAvailableIps()
       } else {
@@ -94,85 +97,103 @@ export function CreateUserForm() {
     }
   }
 
-  const ipAddress = watch("ipAddress")
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" {...register("name")} placeholder="John Doe" />
-        {errors.name && (
-          <p className="text-destructive text-sm">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          {...register("email")}
-          placeholder="john@example.com"
-          type="email"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Your Name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.email && (
-          <p className="text-destructive text-sm">{errors.email.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="ipAddress">
-            IP Address
-            <span className="text-muted-foreground">(Optional)</span>
-          </Label>
-          <Button
-            type="button"
-            disabled={isLoadingIps}
-            onClick={loadAvailableIps}
-            size="sm"
-            variant="outline"
-          >
-            <RefreshCw
-              className={cn("size-4", isLoadingIps ? "animate-spin" : "")}
-            />
-            <span>Refresh</span>
-          </Button>
-        </div>
-
-        <VirtualizedCombobox
-          options={availableIps}
-          value={ipAddress}
-          onSelectOption={(value) => {
-            setValue("ipAddress", value)
-          }}
-          selectPlaceholder="Select an IP address"
-          searchPlaceholder="Search IP addresses..."
-          width="200px"
-          height="200px"
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Enter your email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="ipAddress"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>
+                <p>
+                  IP Address{" "}
+                  <span className="text-muted-foreground">(Optional)</span>
+                </p>
+              </FormLabel>
+              <div className="flex items-center justify-between">
+                <FormControl>
+                  <VirtualizedCombobox
+                    options={availableIps}
+                    value={field.value}
+                    onSelectOption={(value) => {
+                      field.onChange(value)
+                    }}
+                    selectPlaceholder={
+                      isLoadingIps
+                        ? "Loading IP addresses"
+                        : "Select an IP address"
+                    }
+                    searchPlaceholder="Search IP addresses..."
+                    width="calc(100% - 50px)"
+                    height="200px"
+                  />
+                </FormControl>
+                <Hint label="Refresh IPs" asChild>
+                  <Button
+                    type="button"
+                    disabled={isLoadingIps}
+                    onClick={loadAvailableIps}
+                    size="icon"
+                    variant="outline"
+                  >
+                    <RefreshCw
+                      className={cn(
+                        "size-4",
+                        isLoadingIps ? "animate-spin" : "",
+                      )}
+                    />
+                  </Button>
+                </Hint>
+              </div>
+              <FormDescription>
+                If left blank, a random IP will be assigned.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
-        <p className="text-muted-foreground text-sm">
-          If left blank, a random IP will be assigned.
-        </p>
-
-        {errors.ipAddress && (
-          <p className="text-destructive text-sm">{errors.ipAddress.message}</p>
-        )}
-      </div>
-
-      <Button type="submit" disabled={isLoading} size="lg" className="w-full">
-        {isLoading ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            Creating User...
-          </>
-        ) : (
-          <>
-            <UserPlus className="size-4" />
-            <span>Create User</span>
-          </>
-        )}
-      </Button>
-    </form>
+        <Button type="submit" disabled={isLoading} size="lg" className="w-full">
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Creating User...
+            </>
+          ) : (
+            <>
+              <UserPlus className="size-4" />
+              <span>Create User</span>
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
   )
 }
