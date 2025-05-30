@@ -17,12 +17,11 @@ export async function createFirstUserAsAdmin(
   const email = values.email || env.ADMIN_EMAIL
   const password = values.password || env.ADMIN_PASSWORD
 
-  const res = await auth.api.createUser({
+  const res = await auth.api.signUpEmail({
     body: {
       name,
       email,
       password,
-      role: "admin",
     },
     asResponse: true,
   })
@@ -39,6 +38,7 @@ export async function createFirstUserAsAdmin(
     data: {
       emailVerified: true,
       isFirstLogin: false,
+      role: "admin",
     },
   })
 
