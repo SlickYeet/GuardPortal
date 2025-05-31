@@ -9,7 +9,7 @@
 **GuardPortal** is a self-hosted, open-source VPN client portal built with **Next.js** and powered by the **WireGuard Dashboard API**.  
 It offers secure, admin-approved access to WireGuard peer configs — perfect for small teams, personal projects, or home labs.
 
-> No public sign-ups.  
-> Admin-controlled access requests.  
-> QR-based VPN config delivery.  
-> Built with contributors in mind.
+- No public sign-ups.  
+- Admin-controlled access requests.  
+- QR-based VPN config delivery.  
+- Built with contributors in mind.
