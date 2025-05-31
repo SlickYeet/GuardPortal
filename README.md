@@ -1,56 +1,15 @@
-# Create TNT Stack
+# GuardPortal
 
-This is a [TNT-Powered Stack](https://create.tntstack.org/) project bootstrapped
-with `create-tnt-stack`.
+![MIT License](https://img.shields.io/github/license/SlickYeet/vpn-web)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Issues](https://img.shields.io/github/issues/SlickYeet/vpn-web)
+![Last Commit](https://img.shields.io/github/last-commit/SlickYeet/vpn-web)
+![Stars](https://img.shields.io/github/stars/SlickYeet/vpn-web?style=social)
 
-## Where do I go from here?
+**GuardPortal** is a self-hosted, open-source VPN client portal built with **Next.js** and powered by the **WireGuard Dashboard API**.  
+It offers secure, admin-approved access to WireGuard peer configs — perfect for small teams, personal projects, or home labs.
 
-You can treat this project just as you would a regular `create-next-app`
-project, but without needing to implement additional packages yourself. This
-means you can start scaffolding from our base template.
-
-To start developing simply run the following commands:
-
-```bash
-cd your-project-name
-
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
-# or
-bun dev
-```
-
-## Learn More
-
-To learn more about the [TNT Stack](https://create.tntstack.org/), take a look
-at our [documentation](https://create.tntstack.org/).
-
-If you are not familiar with the different technologies used in this project,
-please refer to the respective docs.
-
-- [Next.js](https://nextjs.org)
-- [Payload CMS](https://payloadcms.com)
-- [Auth.js](https://authjs.dev/)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-
-You can check out the
-[create-tnt-stack GitHub repository](https://github.com/SlickYeet/create-tnt-stack)
-— your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-> [!NOTE] Currently, we have a guide for deploying to
-> [Vercel](https://create.tntstack.org/deployment/vercel), with more deployment
-> options coming soon.
-
-Follow our deployment guides for more information
-
-- [Vercel](https://create.tntstack.org/deployment/vercel)
-- [Netlify](https://create.tntstack.org/deployment/netlify) — Coming soon
-- [Docker](https://create.tntstack.org/deployment/docker) — Coming soon
-- [Cloudflare](https://create.tntstack.org/deployment/cloudflare) — Coming soon
+> No public sign-ups.  
+> Admin-controlled access requests.  
+> QR-based VPN config delivery.  
+> Built with contributors in mind.
