@@ -16,7 +16,7 @@ import {
 } from "@react-email/components"
 
 const baseUrl = process.env.NEXT_PUBLIC_URL
-  ? `https://${process.env.NEXT_PUBLIC_URL}`
+  ? process.env.NEXT_PUBLIC_URL
   : "http://localhost:3000"
 const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "lasse@famlam.ca"
 
