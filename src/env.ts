@@ -6,24 +6,24 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.url(),
     BETTER_AUTH_SECRET: z.string(),
-    WIREGUARD_API_ENDPOINT: z.string().url(),
+    WIREGUARD_API_ENDPOINT: z.url(),
     WIREGUARD_API_KEY: z.string(),
     WIREGUARD_VPN_ENDPOINT: z.string(),
     WIREGUARD_VPN_PORT: z.string(),
     RESEND_API_KEY: z.string(),
     REDIS_URL: z.string(),
     ADMIN_NAME: z.string(),
-    ADMIN_EMAIL: z.string().email(),
+    ADMIN_EMAIL: z.email(),
     ADMIN_PASSWORD: z
       .string()
       .min(8, "Password must be at least 8 characters long"),
   },
 
   client: {
-    NEXT_PUBLIC_URL: z.string().url(),
-    NEXT_PUBLIC_CONTACT_EMAIL: z.string().email(),
+    NEXT_PUBLIC_URL: z.url(),
+    NEXT_PUBLIC_CONTACT_EMAIL: z.email(),
   },
 
   runtimeEnv: {

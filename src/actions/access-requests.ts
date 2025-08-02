@@ -1,5 +1,6 @@
 "use server"
 
+import { AccessRequestStatus } from "@prisma/client"
 import { headers } from "next/headers"
 import { z } from "zod"
 
@@ -157,7 +158,7 @@ export async function updateAccessRequest(
 
     const updatedRequest = await db.accessRequest.update({
       where: { id: values.id },
-      data: { status: values.status },
+      data: { status: values.status as AccessRequestStatus },
     })
     if (!updatedRequest) {
       throw new Error("Access request not found")
