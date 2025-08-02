@@ -270,7 +270,7 @@ export function CreateUserForm() {
           {isLoading ? (
             <>
               <Loader2 className="size-4 animate-spin" />
-              Creating User...
+              <span>Creating User...</span>
             </>
           ) : (
             <>

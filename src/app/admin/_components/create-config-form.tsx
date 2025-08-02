@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { type Configuration } from "@prisma/client"
-import { FilePlus2, RefreshCw } from "lucide-react"
+import { FilePlus2, Loader2, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -346,8 +346,17 @@ export function CreateConfigForm({
         </Accordion>
 
         <Button type="submit" disabled={isLoading} size="lg" className="w-full">
-          <FilePlus2 className="size-4" />
-          Create Config
+          {isLoading ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              <span>Creating Config...</span>
+            </>
+          ) : (
+            <>
+              <FilePlus2 className="size-4" />
+              <span>Create Config</span>
+            </>
+          )}
         </Button>
       </form>
     </Form>
