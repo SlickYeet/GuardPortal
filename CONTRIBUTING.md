@@ -21,7 +21,7 @@ all kinds are welcome — code, bug reports, docs, ideas, and more.
 ## Local Development
 
 - This project uses **Next.js 15** and **Tailwind CSS 4**.
-- Use **BetterAuth**, **Prisma**, and **MySQL** for auth and DB.
+- Use **BetterAuth**, **Prisma**, and **PostgreSQL** for auth and DB.
 - Interface with the **WireGuard Dashboard API** under the hood
   - If you do not have a WireGuard Dasboard set up for local development, you
     can use `https://vpn-demo.famlam.ca`.
