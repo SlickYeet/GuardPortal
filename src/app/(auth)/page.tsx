@@ -6,6 +6,8 @@ import { db } from "@/server/db"
 import { CreateFirstUser } from "./_components/create-first-user"
 import { SignInForm } from "./_components/signin-form"
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const userCount = await db.user.count()
 
