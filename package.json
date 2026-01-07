@@ -15,8 +15,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "start": "next start",
-    "clean": "rm -rf .next node_modules && pnpm install",
-    "shadcn": "pnpm dlx shadcn@latest"
+    "clean": "rm -rf .next node_modules && bun install",
+    "shadcn": "bunx --bun shadcn@latest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
