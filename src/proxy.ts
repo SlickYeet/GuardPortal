@@ -1,15 +1,19 @@
-import { getSessionCookie } from "better-auth/cookies"
+import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 
+import { auth } from "@/server/auth"
+
 export async function proxy(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request)
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   const { pathname } = new URL(request.url)
 
-  if (!sessionCookie && pathname.startsWith("/vpn")) {
+  if (!session && pathname.startsWith("/vpn")) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  if (sessionCookie && pathname === "/") {
+  if (session && pathname === "/") {
     return NextResponse.redirect(new URL("/vpn", request.url))
   }
 
