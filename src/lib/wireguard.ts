@@ -1,4 +1,4 @@
-import { Configuration, PeerConfig } from "@prisma/client"
+import { Configuration, PeerConfig } from "@/generated/prisma"
 
 export function parsePeerConfig(config: string) {
   function parseSection(section: string): Record<string, string> {

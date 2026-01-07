@@ -1,11 +1,11 @@
 "use client"
 
-import { type AccessRequest } from "@prisma/client"
 import { UserPlus } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { Hint } from "@/components/hint"
 import { Button } from "@/components/ui/button"
+import { type AccessRequest } from "@/generated/prisma"
 
 export function CreateUserFromAccessRequest({
   request,

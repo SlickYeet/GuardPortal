@@ -1,6 +1,5 @@
 "use client"
 
-import { AccessRequest } from "@prisma/client"
 import { format } from "date-fns"
 import { Loader2, RefreshCcw } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -20,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { AccessRequest } from "@/generated/prisma"
 import { cn } from "@/lib/utils"
 
 import { DeleteAccessRequest } from "./delete-access-request"

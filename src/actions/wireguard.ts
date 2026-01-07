@@ -2,11 +2,11 @@
 
 import { readFile } from "fs/promises"
 import path from "path"
-import { type Configuration } from "@prisma/client"
 import { headers } from "next/headers"
 import { z } from "zod"
 
 import { env } from "@/env"
+import { type Configuration } from "@/generated/prisma"
 import { formatConfigName } from "@/lib/utils"
 import {
   parsePeerConfig,

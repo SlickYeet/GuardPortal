@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type Configuration } from "@prisma/client"
 import { FilePlus2, Loader2, RefreshCw } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -41,6 +40,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
+import { type Configuration } from "@/generated/prisma"
 import { cn } from "@/lib/utils"
 import { ConfigSchema } from "@/schemas/config"
 import type { User } from "@/types"

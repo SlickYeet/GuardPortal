@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AccessRequestStatus, type AccessRequest } from "@prisma/client"
 import { format } from "date-fns"
 import {
   CircleCheckBig,
@@ -46,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { AccessRequestStatus, type AccessRequest } from "@/generated/prisma"
 import { UpdateAccessRequestSchema } from "@/schemas/request-access"
 
 export function formatStatusLabel(status: AccessRequestStatus) {

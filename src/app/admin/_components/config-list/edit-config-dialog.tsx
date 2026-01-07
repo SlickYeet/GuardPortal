@@ -1,6 +1,5 @@
 "use client"
 
-import { type Configuration } from "@prisma/client"
 import { Edit, Loader2, RefreshCw, Save } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -50,6 +49,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
+import { type Configuration } from "@/generated/prisma"
 import { cn, parseConfigName } from "@/lib/utils"
 import { ConfigUpdateSchema } from "@/schemas/config"
 import type { PeerConfigWithUser, User } from "@/types"

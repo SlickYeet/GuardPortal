@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const SignInSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   password: z.string().min(12, "Password must be at least 12 characters long"),
   rememberMe: z.boolean().optional(),
 })
@@ -9,7 +9,7 @@ export const SignInSchema = z.object({
 export const SignUpSchema = z
   .object({
     name: z.string().optional(),
-    email: z.string().email("Invalid email address").optional(),
+    email: z.email("Invalid email address").optional(),
     password: z
       .string()
       .min(12, "Password must be at least 12 characters long")
@@ -25,7 +25,7 @@ export const SignUpSchema = z
 
 export const FirstTimeLoginSchema = z
   .object({
-    email: z.string().email("Please enter a valid email address"),
+    email: z.email("Please enter a valid email address"),
     password: z
       .string()
       .min(12, "Password must be at least 12 characters long")

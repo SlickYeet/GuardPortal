@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type Configuration } from "@prisma/client"
 import { Loader2, RefreshCw, UserPlus } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -34,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { VirtualizedCombobox } from "@/components/virtualized-combobox"
+import { type Configuration } from "@/generated/prisma"
 import { cn } from "@/lib/utils"
 import { UserSchema } from "@/schemas/user"
 

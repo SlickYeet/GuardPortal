@@ -1,11 +1,11 @@
 "use server"
 
-import { AccessRequestStatus } from "@prisma/client"
 import { headers } from "next/headers"
 import { z } from "zod"
 
 import { sendEmail } from "@/actions/email"
 import { env } from "@/env"
+import { AccessRequestStatus } from "@/generated/prisma"
 import { rateLimiter } from "@/lib/ratelimit"
 import {
   RequestAccessSchema,

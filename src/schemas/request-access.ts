@@ -1,5 +1,6 @@
-import { AccessRequestStatus } from "@prisma/client"
 import { z } from "zod"
+
+import { AccessRequestStatus } from "@/generated/prisma"
 
 export const RequestAccessSchema = z.object({
   name: z.string().min(1, "Name is required"),
