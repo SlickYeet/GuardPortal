@@ -15,7 +15,7 @@
     "postinstall": "prisma generate",
     "lint": "eslint",
     "format": "prettier --write .",
-    "start": "next start",
+    "start": "bun run db:migrate && next start",
     "clean": "rm -rf .next node_modules bun.lock && bun install",
     "shadcn": "bunx --bun shadcn@latest"
   },
