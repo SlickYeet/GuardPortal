@@ -1,5 +1,8 @@
+import { headers } from "next/headers"
 import Image from "next/image"
 import { redirect } from "next/navigation"
+
+import { auth } from "@/server/auth"
 
 import { SuccessCard } from "./_components/success-card"
 
@@ -13,10 +16,11 @@ export default async function RequestAccessSuccessPage({
   searchParams,
 }: RequestAccessSuccessPageProps) {
   const { email } = await searchParams
-
-  if (!email) {
-    return redirect("/")
-  }
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  
+  if (!session?.session || !email) return redirect("/")
 
   return (
     <div className="flex min-h-screen items-center justify-center py-12 md:py-0">

@@ -1,9 +1,19 @@
+import { headers } from "next/headers"
 import Image from "next/image"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+
+import { auth } from "@/server/auth"
 
 import { RequestAccessForm } from "./_components/request-access-form"
 
-export default function RequestAccessPage() {
+export default async function RequestAccessPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session?.session) return redirect("/")
+
   return (
     <div className="flex min-h-screen items-center justify-center py-12 md:py-0">
       <div className="w-full max-w-md space-y-8">
