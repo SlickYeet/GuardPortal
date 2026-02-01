@@ -99,7 +99,7 @@ export function FirstTimeLogin({ user }: FirstTimeLoginProps) {
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="w-full">
                         <FormLabel>Password</FormLabel>
                         <Input
                           type="password"
@@ -119,7 +119,7 @@ export function FirstTimeLogin({ user }: FirstTimeLoginProps) {
                     control={form.control}
                     name="confirmPassword"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="w-full">
                         <FormLabel>Confirm Password</FormLabel>
                         <Input
                           type="password"
