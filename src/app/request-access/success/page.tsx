@@ -20,7 +20,7 @@ export default async function RequestAccessSuccessPage({
     headers: await headers(),
   })
   
-  if (!session?.session || !email) return redirect("/")
+  if (session?.session || !email) return redirect("/")
 
   return (
     <div className="flex min-h-screen items-center justify-center py-12 md:py-0">

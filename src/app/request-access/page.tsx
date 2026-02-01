@@ -12,7 +12,7 @@ export default async function RequestAccessPage() {
     headers: await headers(),
   })
 
-  if (!session?.session) return redirect("/")
+  if (session?.session) return redirect("/")
 
   return (
     <div className="flex min-h-screen items-center justify-center py-12 md:py-0">
