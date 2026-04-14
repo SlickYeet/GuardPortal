@@ -2,4 +2,6 @@ import Redis from "ioredis"
 
 import { env } from "@/env"
 
-export const redis = new Redis(env.REDIS_URL)
+export function getRedis() {
+  return new Redis(env.REDIS_URL);
+}

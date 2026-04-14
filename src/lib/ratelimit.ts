@@ -1,4 +1,4 @@
-import { redis } from "@/lib/redis"
+import { getRedis } from "@/lib/redis"
 
 type RateLimitResponse = {
   limit: number
@@ -20,10 +20,10 @@ export async function rateLimiter({
 }: RateLimiterOptions): Promise<RateLimitResponse> {
   const key = `ratelimit:${ip}`
 
-  const currentCount = await redis.get(key)
+  const currentCount = await getRedis().get(key)
   const count = parseInt(currentCount as string, 10) || 0
 
-  const ttl = await redis.ttl(key)
+  const ttl = await getRedis().ttl(key)
 
   if (count >= limit) {
     // Calculate reset time in ms from now
@@ -38,13 +38,13 @@ export async function rateLimiter({
 
   // Set the expiry if first request
   if (count === 0) {
-    await redis.set(key, 1, "PX", window)
+    await getRedis().set(key, 1, "PX", window)
   } else {
-    await redis.incr(key)
+    await getRedis().incr(key)
   }
 
   // Updated TTL for next request
-  const newTtl = await redis.ttl(key)
+  const newTtl = await getRedis().ttl(key)
   const reset = Date.now() + (newTtl > 0 ? newTtl * 1000 : window)
 
   return {
