@@ -2,14 +2,14 @@ import { redirect } from "next/navigation"
 
 import { getSession } from "@/lib/auth/utils"
 
-export default async function HomePage() {
+export default async function Page() {
   const session = await getSession()
 
-  if (!session) return redirect("/login")
+  if (session) return redirect("/")
 
   return (
     <div>
-      <h1>Welcome to the Home Page</h1>
+      <h1>Page</h1>
     </div>
   )
 }
