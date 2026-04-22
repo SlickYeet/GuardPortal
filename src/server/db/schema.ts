@@ -15,6 +15,7 @@ export const user = createTable(
     id: d.text("id").primaryKey(),
     image: d.text("image"),
     name: d.text("name").notNull(),
+    role: d.text("role"),
     updatedAt: d
       .timestamp("updated_at")
       .defaultNow()
