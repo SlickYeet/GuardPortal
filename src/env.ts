@@ -8,9 +8,6 @@ export const env = createEnv({
   },
   emptyStringAsUndefined: true,
   runtimeEnv: {
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
-    ADMIN_NAME: process.env.ADMIN_NAME,
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     AUTHENTIK_CLIENT_ID: process.env.AUTHENTIK_CLIENT_ID,
     AUTHENTIK_CLIENT_SECRET: process.env.AUTHENTIK_CLIENT_SECRET,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
@@ -26,9 +23,6 @@ export const env = createEnv({
     WIREGUARD_VPN_PORT: process.env.WIREGUARD_VPN_PORT,
   },
   server: {
-    ADMIN_EMAIL: z.string(),
-    ADMIN_NAME: z.string(),
-    ADMIN_PASSWORD: z.string(),
     AUTHENTIK_CLIENT_ID: z.string(),
     AUTHENTIK_CLIENT_SECRET: z.string(),
     BETTER_AUTH_SECRET: z.string(),
