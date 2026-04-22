@@ -1,7 +1,8 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/init"
+import { wireguardRouter } from "@/server/api/routers/wireguard"
 
 export const appRouter = createTRPCRouter({
-  // routers
+  wireguard: wireguardRouter,
 })
 
 export type AppRouter = typeof appRouter
