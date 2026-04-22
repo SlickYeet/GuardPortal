@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import { TRPCReactProvider } from "@/lib/api/client"
+import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
 
-const geistSans = Geist({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
 })
 
 const geistMono = Geist_Mono({
@@ -28,7 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          "font-sans antialiased",
+          inter.variable,
+          geistMono.variable,
+        )}
       >
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
