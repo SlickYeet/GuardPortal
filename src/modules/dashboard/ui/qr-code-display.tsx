@@ -15,7 +15,7 @@ export function QRCodeDisplay({ peerConfig, size }: QRCodeDisplayProps) {
   const isMobile = useIsMobile()
   if (isMobile) size = 200
 
-  const configString = peerConfigToWGConfig(peerConfig)
+  const peerConfigString = peerConfigToWGConfig(peerConfig)
 
   return (
     <div className="flex justify-center">
@@ -24,7 +24,7 @@ export function QRCodeDisplay({ peerConfig, size }: QRCodeDisplayProps) {
         className="rounded-lg border"
         fgColor="#fafafa"
         size={size}
-        value={configString}
+        value={peerConfigString}
       />
     </div>
   )
