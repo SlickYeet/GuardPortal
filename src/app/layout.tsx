@@ -3,6 +3,7 @@ import { Geist_Mono, Inter } from "next/font/google"
 
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { TRPCReactProvider } from "@/lib/api/client"
 import { cn } from "@/lib/utils"
 
@@ -42,7 +43,7 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <ThemeProvider>
-            {children}
+            <TooltipProvider>{children}</TooltipProvider>
             <Toaster closeButton richColors />
           </ThemeProvider>
         </TRPCReactProvider>
