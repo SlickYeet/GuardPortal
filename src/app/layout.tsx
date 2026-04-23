@@ -30,6 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta content="GuardPortal" name="apple-mobile-web-app-title" />
+      </head>
       <body
         className={cn(
           "font-sans antialiased",
