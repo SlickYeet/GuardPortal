@@ -39,7 +39,7 @@ export function LoginForm() {
 
   return (
     <Card>
-      <CardContent>
+      <CardContent className="px-8 py-6">
         <Button
           className="w-full"
           disabled={isLoading}
