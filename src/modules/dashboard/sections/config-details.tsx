@@ -32,6 +32,8 @@ export function ConfigDetailsSection({
   peerConfig,
   isAdmin,
 }: ConfigDetailsSectionProps) {
+  // TODO suspense
+
   const configName = parsePeerConfigName(peerConfig.name)
 
   const CONFIG_DETAILS = [
