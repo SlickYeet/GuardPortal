@@ -1,7 +1,29 @@
-import { relations, sql } from "drizzle-orm"
+import { relations } from "drizzle-orm"
 import { index, pgTableCreator } from "drizzle-orm/pg-core"
 
 export const createTable = pgTableCreator((name) => `guardportal_${name}`)
+
+export const peerConfigTable = createTable(
+  "peer_config",
+  (d) => ({
+    allowedIPs: d.text("allowed_ips").notNull(),
+    dns: d.text("dns").notNull(),
+    endpoint: d.text("endpoint").notNull(),
+    endpointAllowedIP: d.text("endpoint_allowed_ip").notNull(),
+    id: d.text("id").primaryKey(),
+    keepAlive: d.integer("keep_alive").notNull().default(21),
+    mtu: d.integer("mtu").notNull().default(1420),
+    name: d.text("name").notNull(),
+    preSharedKey: d.text("pre_shared_key").notNull(),
+    privateKey: d.text("private_key").notNull(),
+    publicKey: d.text("public_key").notNull(),
+    userId: d
+      .text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  }),
+  (t) => [index("peer_config_userId_idx").on(t.userId)],
+)
 
 export const user = createTable(
   "user",
@@ -13,7 +35,7 @@ export const user = createTable(
     email: d.text("email").notNull().unique(),
     emailVerified: d.boolean("email_verified").default(false).notNull(),
     id: d.text("id").primaryKey(),
-    image: d.text("image"),
+    image: d.text("image").default("https://gravatar.com/avatar/HASH"),
     name: d.text("name").notNull(),
     role: d.text("role"),
     updatedAt: d
