@@ -34,7 +34,7 @@ export function UserMenu({ isAdmin, user }: UserMenuProps) {
     await signOut({
       fetchOptions: {
         onSuccess() {
-          router.push("/auth/signin")
+          router.push("/login")
         },
       },
     })
