@@ -32,8 +32,6 @@ export function ConfigDetailsSection({
   peerConfig,
   isAdmin,
 }: ConfigDetailsSectionProps) {
-  // TODO suspense
-
   const configName = parsePeerConfigName(peerConfig.name)
 
   const CONFIG_DETAILS = [
@@ -69,7 +67,7 @@ export function ConfigDetailsSection({
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex h-full flex-col justify-between gap-y-4">
         {CONFIG_DETAILS.map(({ label, value, icon: Icon }) => (
           <div key={label}>
             <Label className="text-muted-foreground">

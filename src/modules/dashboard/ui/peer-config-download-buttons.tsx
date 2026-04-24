@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button"
 import { peerConfigToWGConfig } from "@/helpers/peer-config-to-wg-config"
 import type { PeerConfig } from "@/server/db/schema"
 
+interface PeerConfigDownloadButtonsProps {
+  peerConfig: PeerConfig
+}
+
 export function PeerConfigDownloadButtons({
   peerConfig,
-}: {
-  peerConfig: PeerConfig
-}) {
+}: PeerConfigDownloadButtonsProps) {
   const [state, setState] = React.useState({
     copied: false,
     downloading: false,

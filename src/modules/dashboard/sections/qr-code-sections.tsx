@@ -12,9 +12,11 @@ import {
 import { QRCodeDisplay } from "@/modules/dashboard/ui/qr-code-display"
 import type { PeerConfig } from "@/server/db/schema"
 
-export function QRCodeSection({ peerConfig }: { peerConfig: PeerConfig }) {
-  // TODO suspense
+interface QRCodeSectionProps {
+  peerConfig: PeerConfig
+}
 
+export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
   return (
     <Card>
       <CardHeader>
