@@ -14,7 +14,7 @@ export const peerConfigTable = createTable(
     keepAlive: d.integer("keep_alive").notNull().default(21),
     mtu: d.integer("mtu").notNull().default(1420),
     name: d.text("name").notNull(),
-    preSharedKey: d.text("pre_shared_key").notNull(),
+    preSharedKey: d.text("pre_shared_key"),
     privateKey: d.text("private_key").notNull(),
     publicKey: d.text("public_key").notNull(),
     userId: d
