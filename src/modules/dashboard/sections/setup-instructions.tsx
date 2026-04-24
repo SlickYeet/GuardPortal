@@ -6,8 +6,8 @@ export function SetupInstructionsSection() {
   return (
     <Card className="mt-8">
       <CardHeader>
-        <CardTitle>
-          <SettingsIcon className="mr-2 inline-block size-4" />
+        <CardTitle className="flex items-center gap-2">
+          <SettingsIcon className="inline-block size-5" />
           Setup Instructions
         </CardTitle>
       </CardHeader>

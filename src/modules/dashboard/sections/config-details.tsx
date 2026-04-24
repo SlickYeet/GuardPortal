@@ -46,8 +46,8 @@ export function ConfigDetailsSection({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>
-              <Settings2Icon className="mr-2 inline-block size-4" />
+            <CardTitle className="flex items-center gap-2">
+              <Settings2Icon className="inline-block size-5" />
               Configuration Details
             </CardTitle>
             <CardDescription>
