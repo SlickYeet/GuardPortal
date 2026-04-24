@@ -19,12 +19,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { Skeleton } from "@/components/ui/skeleton"
 import { parsePeerConfigName } from "@/helpers/parse-peer-config-name"
 import { PeerConfigDownloadButtons } from "@/modules/dashboard/ui/peer-config-download-buttons"
 import type { PeerConfig } from "@/server/db/schema"
 
 interface ConfigDetailsSectionProps {
-  peerConfig: PeerConfig
+  peerConfig: PeerConfig | null
   isAdmin: boolean
 }
 
@@ -32,13 +33,29 @@ export function ConfigDetailsSection({
   peerConfig,
   isAdmin,
 }: ConfigDetailsSectionProps) {
-  const configName = parsePeerConfigName(peerConfig.name)
+  const configName = peerConfig ? parsePeerConfigName(peerConfig.name) : null
 
   const CONFIG_DETAILS = [
-    { icon: FileTextIcon, label: "Name", value: configName },
-    { icon: ServerIcon, label: "Server", value: peerConfig.endpoint },
-    { icon: GlobeIcon, label: "Allowed IPs", value: peerConfig.allowedIPs },
-    { icon: CloudCogIcon, label: "DNS", value: peerConfig.dns },
+    {
+      icon: FileTextIcon,
+      label: "Name",
+      value: configName,
+    },
+    {
+      icon: ServerIcon,
+      label: "Server",
+      value: peerConfig?.endpoint ?? null,
+    },
+    {
+      icon: GlobeIcon,
+      label: "Allowed IPs",
+      value: peerConfig?.allowedIPs ?? null,
+    },
+    {
+      icon: CloudCogIcon,
+      label: "DNS",
+      value: peerConfig?.dns ?? null,
+    },
   ]
 
   return (
@@ -54,7 +71,7 @@ export function ConfigDetailsSection({
               Your WireGuard configuration details
             </CardDescription>
           </div>
-          {isAdmin && (
+          {isAdmin && peerConfig && (
             <Button
               nativeButton={false}
               render={
@@ -74,10 +91,21 @@ export function ConfigDetailsSection({
               <Icon className="size-3.5" />
               {label}
             </Label>
-            <p className="text-sm">{value}</p>
+            {value ? (
+              <p className="text-sm">{value}</p>
+            ) : (
+              <Skeleton className="mt-1 h-4 w-40 rounded-md" />
+            )}
           </div>
         ))}
-        <PeerConfigDownloadButtons peerConfig={peerConfig} />
+        {peerConfig ? (
+          <PeerConfigDownloadButtons peerConfig={peerConfig} />
+        ) : (
+          <div className="space-y-2 pt-4">
+            <Skeleton className="h-9 w-full rounded-2xl" />
+            <Skeleton className="h-9 w-full rounded-2xl" />
+          </div>
+        )}
       </CardContent>
     </Card>
   )
