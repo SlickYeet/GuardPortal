@@ -75,7 +75,7 @@ export function UserMenu({ isAdmin, user }: UserMenuProps) {
                     {user.name}
                   </span>
                   {isAdmin && (
-                    <Hint label="Admin User">
+                    <Hint label="Admin">
                       <ShieldIcon className="size-3.5 fill-primary text-primary" />
                     </Hint>
                   )}
