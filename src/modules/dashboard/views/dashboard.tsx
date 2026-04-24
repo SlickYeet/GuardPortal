@@ -45,7 +45,7 @@ export function DashboardView({ session }: { session: Session }) {
             <>
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-lg bg-black/15"
+                className="pointer-events-none absolute inset-0 rounded-lg bg-black/10"
               />
               <div className="absolute top-1/2 left-1/2 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2">
                 <Alert variant="destructive">
@@ -59,10 +59,11 @@ export function DashboardView({ session }: { session: Session }) {
                   <AlertAction>
                     <Button
                       nativeButton={false}
-                      render={<Link href={DISCORD_URL} />}
+                      render={<Link href={isAdmin ? "/admin" : DISCORD_URL} />}
                       variant="outline"
                     >
-                      Get Help <ArrowUpRight className="size-3.5" />
+                      {isAdmin ? "Go to Admin Panel" : "Get Help"}
+                      <ArrowUpRight className="size-3.5" />
                     </Button>
                   </AlertAction>
                 </Alert>

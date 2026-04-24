@@ -98,7 +98,7 @@ export function UserMenu({ isAdmin, user }: UserMenuProps) {
               render={<Link href={pathname === "/admin" ? "/" : "/admin"} />}
             >
               <ShieldIcon />
-              {pathname === "/admin" ? "VPN Details" : "Admin Dashboard"}
+              {pathname === "/admin" ? "VPN Details" : "Admin Panel"}
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
