@@ -1,6 +1,7 @@
 "use client"
 
 import { QrCodeIcon } from "lucide-react"
+import QRCode from "react-qr-code"
 
 import {
   Card,
@@ -9,11 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { FALLBACK_QR_URL } from "@/constants"
 import { QRCodeDisplay } from "@/modules/dashboard/ui/qr-code-display"
 import type { PeerConfig } from "@/server/db/schema"
 
 interface QRCodeSectionProps {
-  peerConfig: PeerConfig
+  peerConfig: PeerConfig | null
 }
 
 export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
@@ -29,7 +31,18 @@ export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <QRCodeDisplay peerConfig={peerConfig} />
+        {peerConfig ? (
+          <QRCodeDisplay peerConfig={peerConfig} />
+        ) : (
+          <div className="flex justify-center">
+            <QRCode
+              bgColor="#18181b"
+              className="rounded-lg border"
+              fgColor="#fafafa"
+              value={FALLBACK_QR_URL}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   )
