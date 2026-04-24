@@ -16,14 +16,15 @@ export function LoginView() {
             rel="noopener noreferrer"
             target="_blank"
           >
-            <Image
-              alt="wireguard logo"
-              className="mx-auto h-20 w-auto"
-              height={80}
-              loading="eager"
-              src="/wireguard.svg"
-              width={120}
-            />
+            <div className="relative mx-auto h-20 w-auto">
+              <Image
+                alt="wireguard logo"
+                className="object-contain"
+                fill
+                loading="eager"
+                src="/wireguard.svg"
+              />
+            </div>
           </a>
           <h1 className="my-6 text-center font-bold text-3xl md:text-4xl">
             Sign in to {APP_NAME}
