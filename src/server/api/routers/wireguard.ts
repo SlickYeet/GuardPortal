@@ -25,13 +25,6 @@ export const wireguardRouter = createTRPCRouter({
         .leftJoin(peerConfigTable, eq(peerConfigTable.userId, userTable.id))
         .where(eq(userTable.id, input.userId))
 
-      if (!user?.peerConfig) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Peer configuration not found for user",
-        })
-      }
-
       return user.peerConfig
     }),
 
