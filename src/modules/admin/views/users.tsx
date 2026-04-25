@@ -18,7 +18,6 @@ export function UsersView({ currentUserId }: { currentUserId: string }) {
             View and manage users in the system.
           </CardDescription>
         </div>
-        {/* // TODO: implement */}
         <CreateUserModal />
       </CardHeader>
       <CardContent>
