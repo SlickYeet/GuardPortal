@@ -56,29 +56,33 @@ export function DashboardView({ session }: { session: Session }) {
                   "top-1/5 -translate-y-1/5",
                 )}
               >
-                <Alert variant="destructive">
-                  <AlertTriangleIcon />
-                  <AlertTitle>Peer Configuration Not Found</AlertTitle>
-                  <AlertDescription>
-                    We couldn&apos;t find the WireGuard configuration for your
-                    account. Please contact support if you believe this is an
-                    error.
-                  </AlertDescription>
-                  <AlertAction>
-                    <Button
-                      nativeButton={false}
-                      render={
-                        <Link href={isAdmin ? "/admin/configs" : DISCORD_URL} />
-                      }
-                      size={isMobile ? "icon" : "sm"}
-                      variant="outline"
-                    >
-                      {!isMobile &&
-                        (isAdmin ? "Go to Admin Panel" : "Get Help")}
-                      <ArrowUpRight className="size-4" />
-                    </Button>
-                  </AlertAction>
-                </Alert>
+                <div className="rounded-2xl bg-card">
+                  <Alert variant="destructive">
+                    <AlertTriangleIcon />
+                    <AlertTitle>Peer Configuration Not Found</AlertTitle>
+                    <AlertDescription>
+                      We couldn&apos;t find the WireGuard configuration for your
+                      account. Please contact support if you believe this is an
+                      error.
+                    </AlertDescription>
+                    <AlertAction>
+                      <Button
+                        nativeButton={false}
+                        render={
+                          <Link
+                            href={isAdmin ? "/admin/configs" : DISCORD_URL}
+                          />
+                        }
+                        size={isMobile ? "icon" : "sm"}
+                        variant="secondary"
+                      >
+                        {!isMobile &&
+                          (isAdmin ? "Go to Admin Panel" : "Get Help")}
+                        <ArrowUpRight className="size-4" />
+                      </Button>
+                    </AlertAction>
+                  </Alert>
+                </div>
               </div>
             </>
           )}
