@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { InfoIcon, UserPlusIcon } from "lucide-react"
+import { AlertTriangleIcon, InfoIcon, UserPlusIcon } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -71,6 +71,16 @@ interface CreateUserFormProps {
 function CreateUserForm({ setOpen }: CreateUserFormProps) {
   const utils = api.useUtils()
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    defaultValues: {
+      email: "",
+      emailVerified: false,
+      name: "",
+      role: "user",
+    },
+    resolver: zodResolver(formSchema),
+  })
+
   const createUser = api.admin.users.create.useMutation({
     onError(error) {
       toast.error("Something went wrong", {
@@ -85,18 +95,8 @@ function CreateUserForm({ setOpen }: CreateUserFormProps) {
     },
   })
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    defaultValues: {
-      email: "",
-      emailVerified: false,
-      name: "",
-      role: "user",
-    },
-    resolver: zodResolver(formSchema),
-  })
-
   function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data)
+    createUser.mutate(data)
   }
 
   const isPending = form.formState.isSubmitting || createUser.isPending
@@ -104,7 +104,7 @@ function CreateUserForm({ setOpen }: CreateUserFormProps) {
   return (
     <>
       <Alert className="max-md:mb-4" variant="warning">
-        <InfoIcon />
+        <AlertTriangleIcon />
         <AlertTitle>
           Creating users through GuardPortal is not recommended.
         </AlertTitle>
@@ -217,17 +217,22 @@ function CreateUserForm({ setOpen }: CreateUserFormProps) {
             )}
           />
 
-          <p>
-            A peer config will be automatically generated for the user.{" "}
-            <br className="hidden md:block" /> You can edit it{" "}
-            <Link
-              className="underline underline-offset-2 transition-all hover:text-primary"
-              href="/admin/configs"
-            >
-              here
-            </Link>{" "}
-            after creating the user.
-          </p>
+          <Alert variant="info">
+            <InfoIcon />
+            <AlertTitle>
+              A peer config will be automatically generated for the user.
+            </AlertTitle>
+            <AlertDescription>
+              You can edit it{" "}
+              <Link
+                className="underline underline-offset-2 transition-all hover:text-primary"
+                href="/admin/configs"
+              >
+                here
+              </Link>{" "}
+              after creating the user.
+            </AlertDescription>
+          </Alert>
 
           <div className="flex items-center justify-end gap-2">
             <Button
