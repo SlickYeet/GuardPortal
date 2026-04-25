@@ -34,7 +34,8 @@ export default async function Layout({ children }: LayoutProps<"/">) {
           </div>
           <UserMenu isAdmin={isAdmin} user={session.user} />
         </div>
-        <AdminTabs>{children}</AdminTabs>
+        <AdminTabs />
+        <main className="mt-4">{children}</main>
       </div>
     </div>
   )
