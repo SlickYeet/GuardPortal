@@ -75,7 +75,7 @@ function EditUserForm({ currentUserId, setOpen, user }: EditUserFormProps) {
     resolver: zodResolver(userInsertSchema),
   })
 
-  const editUser = api.admin.users.update.useMutation({
+  const updateUser = api.admin.users.update.useMutation({
     onError(error) {
       toast.error("Something went wrong", {
         description: error.message,
@@ -89,19 +89,19 @@ function EditUserForm({ currentUserId, setOpen, user }: EditUserFormProps) {
     },
   })
 
-  async function onSubmit(data: z.infer<typeof userInsertSchema>) {
+  function onSubmit(data: z.infer<typeof userInsertSchema>) {
     if (user.id === currentUserId) {
       toast.error("You cannot edit your own user.")
       return
     }
 
-    console.log(data)
+    updateUser.mutate(data)
   }
 
-  const isPending = form.formState.isSubmitting || editUser.isPending
+  const isPending = form.formState.isSubmitting || updateUser.isPending
 
   return (
-    <form id="edit-user-form" onSubmit={form.handleSubmit(onSubmit)}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Controller
