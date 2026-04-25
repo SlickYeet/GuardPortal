@@ -67,7 +67,9 @@ export function DashboardView({ session }: { session: Session }) {
                   <AlertAction>
                     <Button
                       nativeButton={false}
-                      render={<Link href={isAdmin ? "/admin" : DISCORD_URL} />}
+                      render={
+                        <Link href={isAdmin ? "/admin/configs" : DISCORD_URL} />
+                      }
                       size={isMobile ? "icon" : "sm"}
                       variant="outline"
                     >
