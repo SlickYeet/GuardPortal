@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { DISCORD_URL } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
 import type { Session } from "@/lib/auth/utils"
 import { cn } from "@/lib/utils"
@@ -21,6 +22,7 @@ import { QRCodeSection } from "@/modules/dashboard/sections/qr-code-sections"
 import { SetupInstructionsSection } from "@/modules/dashboard/sections/setup-instructions"
 
 export function DashboardView({ session }: { session: Session }) {
+  const isMobile = useIsMobile()
   const isAdmin = isUserAdmin(session)
 
   const [peerConfig] = api.wireguard.getPeerConfigByUserId.useSuspenseQuery({
@@ -47,7 +49,13 @@ export function DashboardView({ session }: { session: Session }) {
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-lg bg-black/10"
               />
-              <div className="absolute top-1/2 left-1/2 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2">
+              <div
+                className={cn(
+                  "absolute left-1/2 w-full max-w-2xl -translate-x-1/2",
+                  "md:top-1/2 md:-translate-y-1/2",
+                  "top-1/5 -translate-y-1/5",
+                )}
+              >
                 <Alert variant="destructive">
                   <AlertTriangleIcon />
                   <AlertTitle>Peer Configuration Not Found</AlertTitle>
@@ -60,10 +68,12 @@ export function DashboardView({ session }: { session: Session }) {
                     <Button
                       nativeButton={false}
                       render={<Link href={isAdmin ? "/admin" : DISCORD_URL} />}
+                      size={isMobile ? "icon" : "sm"}
                       variant="outline"
                     >
-                      {isAdmin ? "Go to Admin Panel" : "Get Help"}
-                      <ArrowUpRight className="size-3.5" />
+                      {!isMobile &&
+                        (isAdmin ? "Go to Admin Panel" : "Get Help")}
+                      <ArrowUpRight className="size-4" />
                     </Button>
                   </AlertAction>
                 </Alert>
