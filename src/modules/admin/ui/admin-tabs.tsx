@@ -28,18 +28,17 @@ export function AdminTabs() {
   const pathname = usePathname()
   const isMobile = useIsMobile()
 
-  const [currentTab, setCurrentTab] = React.useState<Tab["value"]>(() => {
+  const currentTab = React.useMemo<Tab["value"]>(() => {
     const pathParts = pathname.split("/")
     const lastPart = pathParts[pathParts.length - 1]
     if (TABS.some((tab) => tab.value === lastPart)) {
       return lastPart as Tab["value"]
     }
     return "users"
-  })
+  }, [pathname])
 
   function handleTabChange(tab: string | null) {
     const validTab = tab as Tab["value"]
-    setCurrentTab(validTab)
     router.push(`/admin/${validTab}`)
   }
 

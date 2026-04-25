@@ -30,6 +30,8 @@ export function UserMenu({ isAdmin, user }: UserMenuProps) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
 
+  const isOnAdminRoute = pathname.startsWith("/admin")
+
   async function handleSignOut() {
     await signOut({
       fetchOptions: {
@@ -95,10 +97,10 @@ export function UserMenu({ isAdmin, user }: UserMenuProps) {
           {isAdmin && (
             <DropdownMenuItem
               nativeButton={false}
-              render={<Link href={pathname === "/admin" ? "/" : "/admin"} />}
+              render={<Link href={isOnAdminRoute ? "/" : "/admin"} />}
             >
               <ShieldIcon />
-              {pathname === "/admin" ? "VPN Details" : "Admin Panel"}
+              {isOnAdminRoute ? "VPN Details" : "Admin Panel"}
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
