@@ -12,6 +12,45 @@ import {
 
 export const adminRouter = createTRPCRouter({
   users: createTRPCRouter({
+    create: adminProcedure
+      .input(userInsertSchema)
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        if (input.id === adminUserId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "You cannot create a user with your own ID",
+          })
+        }
+
+        const [existingUser] = await ctx.db
+          .select()
+          .from(userTable)
+          .where(eq(userTable.id, input.id))
+
+        if (existingUser) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `User with ID ${input.id} already exists`,
+          })
+        }
+
+        const [newUser] = await ctx.db
+          .insert(userTable)
+          .values(input)
+          .returning()
+
+        if (!newUser) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create user",
+          })
+        }
+
+        return newUser
+      }),
+
     list: adminProcedure
       .input(
         z.object({
