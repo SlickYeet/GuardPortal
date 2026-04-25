@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm"
 import { index, pgTableCreator } from "drizzle-orm/pg-core"
+import { createInsertSchema } from "drizzle-zod"
 
 export const createTable = pgTableCreator((name) => `guardportal_${name}`)
 
@@ -51,6 +52,8 @@ export const user = createTable(
     index("user_email_idx").on(t.email),
   ],
 )
+
+export const userInsertSchema = createInsertSchema(user)
 
 export const session = createTable(
   "session",
