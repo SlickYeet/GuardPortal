@@ -1,9 +1,12 @@
 import { TRPCError } from "@trpc/server"
 import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
+import { headers } from "next/headers"
 import * as z from "zod"
 
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
+import { deleteUserSchema } from "@/modules/admin/schema/user"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
+import { auth } from "@/server/auth"
 import {
   peerConfigTable,
   userInsertSchema,
@@ -13,33 +16,29 @@ import {
 export const adminRouter = createTRPCRouter({
   users: createTRPCRouter({
     create: adminProcedure
-      .input(userInsertSchema)
-      .mutation(async ({ ctx, input }) => {
-        const { id: adminUserId } = ctx.session.user
+      .input(
+        userInsertSchema.pick({
+          email: true,
+          emailVerified: true,
+          name: true,
+          role: true,
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const role = (input.role ?? "user") as "admin" | "user"
 
-        if (input.id === adminUserId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "You cannot create a user with your own ID",
-          })
-        }
-
-        const [existingUser] = await ctx.db
-          .select()
-          .from(userTable)
-          .where(eq(userTable.id, input.id))
-
-        if (existingUser) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: `User with ID ${input.id} already exists`,
-          })
-        }
-
-        const [newUser] = await ctx.db
-          .insert(userTable)
-          .values(input)
-          .returning()
+        const newUser = await auth.api.createUser({
+          body: {
+            data: {
+              emailVerified: input.emailVerified,
+            },
+            email: input.email,
+            name: input.name,
+            // TODO: generate a random password and email it to the user
+            password: crypto.randomUUID(),
+            role,
+          },
+        })
 
         if (!newUser) {
           throw new TRPCError({
@@ -48,7 +47,44 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
+        // TODO: create peer config for new user
+
         return newUser
+      }),
+
+    delete: adminProcedure
+      .input(deleteUserSchema)
+      .mutation(async ({ ctx, input }) => {
+        const { id: adminUserId } = ctx.session.user
+
+        if (input.id === adminUserId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "You cannot delete your own user",
+          })
+        }
+
+        const deletedUser = await auth.api.removeUser({
+          body: {
+            userId: input.id,
+          },
+          headers: await headers(),
+        })
+
+        if (!deletedUser) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to delete user",
+          })
+        }
+
+        if (input.deleteConfig) {
+          await ctx.db
+            .delete(peerConfigTable)
+            .where(eq(peerConfigTable.userId, input.id))
+        }
+
+        return deletedUser
       }),
 
     list: adminProcedure
