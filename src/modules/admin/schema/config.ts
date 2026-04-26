@@ -1,5 +1,9 @@
 import * as z from "zod"
 
+/**
+ * This schema must be maintained indepentantly from the rest of the code base.
+ * @see https://documenter.getpostman.com/view/31393369/2sB3dTsTEi#7dcaf04a-027d-4a1a-af11-b66f1d59cfe7
+ */
 export const wireguardConfig = z.object({
   allowed_ip: z.string(),
   configuration: z.object({

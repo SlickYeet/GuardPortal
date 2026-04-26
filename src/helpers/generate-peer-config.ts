@@ -79,7 +79,7 @@ export async function generatePeerConfig({
       configurationPublicKey: peer.configuration.PublicKey,
       dns: peer.DNS,
       endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
-      endpointAllowedIP: peer.endpoint_allowed_ip,
+      endpointAllowedIPs: peer.endpoint_allowed_ip,
       id: peer.id,
       keepAlive: peer.keepalive,
       mtu: peer.mtu,

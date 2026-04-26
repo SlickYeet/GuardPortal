@@ -36,6 +36,13 @@
       "when": 1777185469789,
       "tag": "0004_cultured_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1777185872699,
+      "tag": "0005_woozy_white_queen",
+      "breakpoints": true
     }
   ]
 }

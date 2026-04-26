@@ -15,7 +15,7 @@ export const peerConfigTable = createTable(
     configurationPublicKey: d.text("configuration_public_key").notNull(),
     dns: d.text("dns").notNull(),
     endpoint: d.text("endpoint").notNull(),
-    endpointAllowedIP: d.text("endpoint_allowed_ip").notNull(),
+    endpointAllowedIPs: d.text("endpoint_allowed_ips").notNull(),
     id: d.text("id").primaryKey(),
     keepAlive: d.integer("keep_alive").notNull().default(21),
     mtu: d.integer("mtu").notNull().default(1420),
