@@ -1,8 +1,7 @@
 "use client"
 
-import { CheckCircleIcon, Trash2Icon, XCircleIcon } from "lucide-react"
+import { CheckCircleIcon, XCircleIcon } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
+import { DeleteUserModal } from "@/modules/admin/ui/delete-user-modal"
 import { EditUserModal } from "@/modules/admin/ui/edit-user-modal"
 
 export function UserTable({ currentUserId }: { currentUserId: string }) {
@@ -20,6 +20,8 @@ export function UserTable({ currentUserId }: { currentUserId: string }) {
     { limit: DEFAULT_FETCH_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
+
+  // TODO: pagination
 
   return (
     <Table className="rounded-md border not-odd:bg-muted/50">
@@ -54,10 +56,7 @@ export function UserTable({ currentUserId }: { currentUserId: string }) {
               <TableCell className="flex justify-end space-x-2">
                 {/* // TODO: consume peer config in EditUserModal */}
                 <EditUserModal currentUserId={currentUserId} user={user} />
-                <Button disabled size="icon" variant="destructive">
-                  <Trash2Icon />
-                  <span className="sr-only">Delete</span>
-                </Button>
+                <DeleteUserModal currentUserId={currentUserId} user={user} />
               </TableCell>
             </TableRow>
           ))}
