@@ -6,6 +6,7 @@ import { genericOAuth } from "better-auth/plugins/generic-oauth"
 
 import { APP_NAME } from "@/constants"
 import { env } from "@/env"
+import { generatePeerConfig } from "@/helpers/generate-peer-config"
 import { getRedisClient } from "@/lib/redis"
 import { db } from "@/server/db"
 import { user as userTable } from "@/server/db/schema"
@@ -22,7 +23,7 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        async after() {
+        async after({ id, name }) {
           const users = await db.$count(userTable)
           if (users === 1) {
             await db.update(userTable).set({
@@ -30,6 +31,10 @@ export const auth = betterAuth({
               role: "admin",
             })
           }
+          await generatePeerConfig({
+            name,
+            userId: id,
+          })
         },
       },
     },

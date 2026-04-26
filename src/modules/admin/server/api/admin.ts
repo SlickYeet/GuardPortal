@@ -4,16 +4,35 @@ import { headers } from "next/headers"
 import * as z from "zod"
 
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
+import { env } from "@/env"
+import { generatePeerConfig } from "@/helpers/generate-peer-config"
 import { deleteUserSchema } from "@/modules/admin/schema/user"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import { auth } from "@/server/auth"
 import {
+  peerConfigInsertSchema,
   peerConfigTable,
   userInsertSchema,
   user as userTable,
 } from "@/server/db/schema"
 
 export const adminRouter = createTRPCRouter({
+  peerConfig: createTRPCRouter({
+    create: adminProcedure
+      .input(
+        peerConfigInsertSchema.pick({
+          name: true,
+          userId: true,
+        }),
+      )
+      .mutation(async ({ input }) => {
+        return await generatePeerConfig({
+          name: input.name,
+          userId: input.userId,
+        })
+      }),
+  }),
+
   users: createTRPCRouter({
     create: adminProcedure
       .input(
@@ -35,7 +54,7 @@ export const adminRouter = createTRPCRouter({
             email: input.email,
             name: input.name,
             // TODO: generate a random password and email it to the user
-            password: crypto.randomUUID(),
+            // password: crypto.randomUUID(),
             role,
           },
         })
@@ -47,7 +66,10 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
-        // TODO: create peer config for new user
+        /**
+         * ? Peer configs are created using databaseHooks in the auth config.
+         * * src/server/auth/index.ts
+         */
 
         return newUser
       }),
@@ -64,6 +86,52 @@ export const adminRouter = createTRPCRouter({
           })
         }
 
+        const [existingUser] = await ctx.db
+          .select({
+            id: userTable.id,
+            peerConfigId: peerConfigTable.id,
+          })
+          .from(userTable)
+          .leftJoin(peerConfigTable, eq(userTable.id, peerConfigTable.userId))
+          .where(eq(userTable.id, input.id))
+
+        if (!existingUser) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `User with ID ${input.id} not found`,
+          })
+        }
+
+        if (input.deleteConfig) {
+          const reqOpts: RequestInit = {
+            body: JSON.stringify({
+              peers: [existingUser.peerConfigId],
+            }),
+            headers: {
+              "Content-Type": "application/json",
+              "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+            },
+            method: "POST",
+            redirect: "follow",
+          }
+
+          const res = await fetch(
+            `${env.WIREGUARD_API_ENDPOINT}/deletePeers/${env.WIREGUARD_CONFIG_NAME}`,
+            reqOpts,
+          )
+
+          if (!res.ok) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to delete peer config from WireGuard",
+            })
+          }
+
+          await ctx.db
+            .delete(peerConfigTable)
+            .where(eq(peerConfigTable.userId, input.id))
+        }
+
         const deletedUser = await auth.api.removeUser({
           body: {
             userId: input.id,
@@ -76,12 +144,6 @@ export const adminRouter = createTRPCRouter({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to delete user",
           })
-        }
-
-        if (input.deleteConfig) {
-          await ctx.db
-            .delete(peerConfigTable)
-            .where(eq(peerConfigTable.userId, input.id))
         }
 
         return deletedUser
@@ -184,5 +246,32 @@ export const adminRouter = createTRPCRouter({
 
         return updatedUser
       }),
+  }),
+
+  wireguard: createTRPCRouter({
+    getAvailablePeerIPs: adminProcedure.query(async () => {
+      const reqOpts: RequestInit = {
+        headers: {
+          "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+        },
+        method: "GET",
+        redirect: "follow",
+      }
+
+      const res = await fetch(
+        `${env.WIREGUARD_API_ENDPOINT}/getAvailablePeerIPs/${env.WIREGUARD_CONFIG_NAME}`,
+        reqOpts,
+      )
+
+      if (!res.ok) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch available peer IPs",
+        })
+      }
+
+      const json = await res.json()
+      return json.data
+    }),
   }),
 })
