@@ -30,6 +30,7 @@ export function UserTable({ currentUserId }: { currentUserId: string }) {
           <TableHead>Username</TableHead>
           <TableHead>Email</TableHead>
           <TableHead className="text-center">Verified Email</TableHead>
+          <TableHead className="text-center">Banned</TableHead>
           <TableHead className="text-right">Created At</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -47,6 +48,15 @@ export function UserTable({ currentUserId }: { currentUserId: string }) {
                     <CheckCircleIcon className="size-5 text-green-600 dark:text-green-500" />
                   ) : (
                     <XCircleIcon className="size-5 text-destructive" />
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-center">
+                  {user.banned ? (
+                    <CheckCircleIcon className="size-5 text-destructive" />
+                  ) : (
+                    <XCircleIcon className="size-5 text-green-600 dark:text-green-500" />
                   )}
                 </div>
               </TableCell>
