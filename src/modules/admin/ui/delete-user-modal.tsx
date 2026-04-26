@@ -41,6 +41,7 @@ export function DeleteUserModal({ currentUserId, user }: DeleteUserModalProps) {
       trigger={{
         children: <Trash2Icon />,
         disabled: user.id === currentUserId,
+        size: "icon",
         variant: "destructive",
       }}
     >
