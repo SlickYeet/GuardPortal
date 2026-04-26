@@ -22,7 +22,7 @@ export function PeerConfigTable() {
   // TODO: pagination
 
   return (
-    <Table className="rounded-md border not-odd:bg-muted/50">
+    <Table className="even:bg-muted">
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
