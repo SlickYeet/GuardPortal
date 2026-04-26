@@ -29,10 +29,6 @@ export const auth = betterAuth({
               emailVerified: true,
               role: "admin",
             })
-          } else {
-            throw new Error(
-              "Only the first user can be created through the registration form. Please ask your administrator to create an account for you.",
-            )
           }
         },
       },
