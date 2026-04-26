@@ -43,6 +43,13 @@
       "when": 1777185872699,
       "tag": "0005_woozy_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1777239773688,
+      "tag": "0006_fantastic_quicksilver",
+      "breakpoints": true
     }
   ]
 }

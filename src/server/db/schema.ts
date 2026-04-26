@@ -13,6 +13,7 @@ export const peerConfigTable = createTable(
     configurationName: d.text("configuration_name").notNull(),
     configurationPrivateKey: d.text("configuration_private_key").notNull(),
     configurationPublicKey: d.text("configuration_public_key").notNull(),
+    createdAt: d.timestamp("created_at").defaultNow().notNull(),
     dns: d.text("dns").notNull(),
     endpoint: d.text("endpoint").notNull(),
     endpointAllowedIPs: d.text("endpoint_allowed_ips").notNull(),
@@ -23,6 +24,11 @@ export const peerConfigTable = createTable(
     preSharedKey: d.text("pre_shared_key"),
     privateKey: d.text("private_key").notNull(),
     publicKey: d.text("public_key").notNull(),
+    updatedAt: d
+      .timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
     userId: d
       .text("user_id")
       .notNull()
