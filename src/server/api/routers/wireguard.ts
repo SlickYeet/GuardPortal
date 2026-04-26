@@ -38,7 +38,7 @@ export const wireguardRouter = createTRPCRouter({
     }
 
     const res = await fetch(
-      `${env.WIREGUARD_API_ENDPOINT}/downloadAllPeers/wg0`,
+      `${env.WIREGUARD_API_ENDPOINT}/downloadAllPeers/${env.WIREGUARD_CONFIG_NAME}`,
       reqOpts,
     )
 
