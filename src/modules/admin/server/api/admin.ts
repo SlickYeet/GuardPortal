@@ -21,12 +21,14 @@ export const adminRouter = createTRPCRouter({
     create: adminProcedure
       .input(
         peerConfigInsertSchema.pick({
+          allowedIP: true,
           name: true,
           userId: true,
         }),
       )
       .mutation(async ({ input }) => {
         return await generatePeerConfig({
+          allowedIP: input.allowedIP,
           name: input.name,
           userId: input.userId,
         })

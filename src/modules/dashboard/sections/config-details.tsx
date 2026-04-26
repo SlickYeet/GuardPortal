@@ -49,7 +49,7 @@ export function ConfigDetailsSection({
     {
       icon: GlobeIcon,
       label: "Allowed IPs",
-      value: peerConfig?.allowedIPs ?? null,
+      value: peerConfig?.allowedIP ?? null,
     },
     {
       icon: CloudCogIcon,
@@ -77,6 +77,8 @@ export function ConfigDetailsSection({
               render={
                 <Link href={`/admin/manage-peers&peerId=${peerConfig.id}`} />
               }
+              size="icon"
+              variant="secondary"
             >
               <EditIcon />
               <span className="sr-only">Edit Configuration</span>

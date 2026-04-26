@@ -12,11 +12,13 @@ import { peerConfigTable } from "@/server/db/schema"
 interface GeneratePeerConfigOpts {
   name: string
   userId: string
+  allowedIP?: string
 }
 
 export async function generatePeerConfig({
   name,
   userId,
+  allowedIP,
 }: GeneratePeerConfigOpts) {
   const formattedName = formatPeerConfigName(name)
 
@@ -33,7 +35,9 @@ export async function generatePeerConfig({
 
   const reqOpts: RequestInit = {
     body: JSON.stringify({
+      endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
       name: formattedName,
+      ...(allowedIP ? { allowed_ips: [allowedIP] } : {}),
     }),
     headers: {
       "Content-Type": "application/json",
@@ -62,14 +66,19 @@ export async function generatePeerConfig({
   const [createdConfig] = await db
     .insert(peerConfigTable)
     .values({
-      allowedIPs: peer.allowed_ip,
+      /**
+       * We only save a single IP.
+       * It is technically possible to save multiple using the following format:
+       * "10.0.0.2,10.0.0.3,10.0.0.4"
+       */
+      allowedIP: peer.allowed_ip,
       configurationAddress: peer.configuration.Address,
       configurationListenPort: parseInt(peer.configuration.ListenPort, 10),
       configurationName: peer.configuration.Name,
       configurationPrivateKey: peer.configuration.PrivateKey,
       configurationPublicKey: peer.configuration.PublicKey,
       dns: peer.DNS,
-      endpoint: peer.endpoint,
+      endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
       endpointAllowedIP: peer.endpoint_allowed_ip,
       id: peer.id,
       keepAlive: peer.keepalive,

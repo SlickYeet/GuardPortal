@@ -7,7 +7,7 @@ export const createTable = pgTableCreator((name) => `guardportal_${name}`)
 export const peerConfigTable = createTable(
   "peer_config",
   (d) => ({
-    allowedIPs: d.text("allowed_ips").notNull(),
+    allowedIP: d.text("allowed_ip").notNull(),
     configurationAddress: d.text("configuration_address").notNull(),
     configurationListenPort: d.integer("configuration_listen_port").notNull(),
     configurationName: d.text("configuration_name").notNull(),
