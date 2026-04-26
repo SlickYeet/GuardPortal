@@ -24,3 +24,7 @@ export const wireguardConfig = z.object({
   private_key: z.string(),
 })
 export type WireguardConfig = z.infer<typeof wireguardConfig>
+
+export const deletePeerConfigSchema = z.object({
+  id: z.string(),
+})
