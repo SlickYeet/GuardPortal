@@ -8,7 +8,7 @@ MTU = ${peerConfig.mtu}
 DNS = ${peerConfig.dns}
 
 [Peer]
-PublicKey = ${peerConfig.publicKey}
+PublicKey = ${peerConfig.configurationPublicKey}
 AllowedIPs = ${peerConfig.endpointAllowedIPs}
 Endpoint = ${peerConfig.endpoint}
 PersistentKeepalive = ${peerConfig.keepAlive}
