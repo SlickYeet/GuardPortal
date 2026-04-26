@@ -6,6 +6,7 @@ import { genericOAuth } from "better-auth/plugins/generic-oauth"
 
 import { APP_NAME } from "@/constants"
 import { env } from "@/env"
+import { formatPeerConfigName } from "@/helpers/format-peer-config-name"
 import { generatePeerConfig } from "@/helpers/generate-peer-config"
 import { getRedisClient } from "@/lib/redis"
 import { db } from "@/server/db"
@@ -31,8 +32,9 @@ export const auth = betterAuth({
               role: "admin",
             })
           }
+          const configName = formatPeerConfigName(name)
           await generatePeerConfig({
-            name,
+            configName,
             userId: id,
           })
         },

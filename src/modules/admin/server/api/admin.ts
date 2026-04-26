@@ -5,13 +5,16 @@ import * as z from "zod"
 
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { env } from "@/env"
+import { formatPeerConfigName } from "@/helpers/format-peer-config-name"
 import { generatePeerConfig } from "@/helpers/generate-peer-config"
-import { deletePeerConfigSchema } from "@/modules/admin/schema/config"
+import {
+  deletePeerConfigSchema,
+  peerConfigInsertSchema,
+} from "@/modules/admin/schema/config"
 import { deleteUserSchema } from "@/modules/admin/schema/user"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import { auth } from "@/server/auth"
 import {
-  peerConfigInsertSchema,
   peerConfigTable,
   userInsertSchema,
   user as userTable,
@@ -20,17 +23,27 @@ import {
 export const adminRouter = createTRPCRouter({
   peerConfigs: createTRPCRouter({
     create: adminProcedure
-      .input(
-        peerConfigInsertSchema.pick({
-          allowedIP: true,
-          name: true,
-          userId: true,
-        }),
-      )
-      .mutation(async ({ input }) => {
+      .input(peerConfigInsertSchema)
+      .mutation(async ({ ctx, input }) => {
+        const [user] = await ctx.db
+          .select()
+          .from(userTable)
+          .where(eq(userTable.id, input.userId))
+
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `User with ID ${input.userId} not found`,
+          })
+        }
+
+        const configName = input.name
+          ? input.name
+          : formatPeerConfigName(user.name)
+
         return await generatePeerConfig({
           allowedIP: input.allowedIP,
-          name: input.name,
+          configName,
           userId: input.userId,
         })
       }),
@@ -370,7 +383,7 @@ export const adminRouter = createTRPCRouter({
       }
 
       const res = await fetch(
-        `${env.WIREGUARD_API_ENDPOINT}/getAvailablePeerIPs/${env.WIREGUARD_CONFIG_NAME}`,
+        `${env.WIREGUARD_API_ENDPOINT}/getAvailableIPs/${env.WIREGUARD_CONFIG_NAME}`,
         reqOpts,
       )
 
@@ -382,7 +395,9 @@ export const adminRouter = createTRPCRouter({
       }
 
       const json = await res.json()
-      return json.data
+      const availableIPs = json.data as Record<string, string[]>
+
+      return availableIPs
     }),
   }),
 })

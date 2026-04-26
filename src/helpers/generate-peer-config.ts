@@ -4,28 +4,25 @@ import { TRPCError } from "@trpc/server"
 import { eq } from "drizzle-orm"
 
 import { env } from "@/env"
-import { formatPeerConfigName } from "@/helpers/format-peer-config-name"
 import type { WireguardConfig } from "@/modules/admin/schema/config"
 import { db } from "@/server/db"
 import { peerConfigTable } from "@/server/db/schema"
 
 interface GeneratePeerConfigOpts {
-  name: string
+  configName: string
   userId: string
   allowedIP?: string
 }
 
 export async function generatePeerConfig({
-  name,
+  configName,
   userId,
   allowedIP,
 }: GeneratePeerConfigOpts) {
-  const formattedName = formatPeerConfigName(name)
-
   const [existingConfig] = await db
     .select()
     .from(peerConfigTable)
-    .where(eq(peerConfigTable.name, formattedName))
+    .where(eq(peerConfigTable.name, configName))
 
   /**
    * We return the existing config here, instead of throwing an error
@@ -36,7 +33,7 @@ export async function generatePeerConfig({
   const reqOpts: RequestInit = {
     body: JSON.stringify({
       endpoint: `${env.WIREGUARD_VPN_ENDPOINT}:${env.WIREGUARD_VPN_PORT}`,
-      name: formattedName,
+      name: configName,
       ...(allowedIP ? { allowed_ips: [allowedIP] } : {}),
     }),
     headers: {
@@ -83,7 +80,7 @@ export async function generatePeerConfig({
       id: peer.id,
       keepAlive: peer.keepalive,
       mtu: peer.mtu,
-      name: formattedName,
+      name: configName,
       preSharedKey: peer.preshared_key,
       privateKey: peer.private_key,
       publicKey: peer.id,
