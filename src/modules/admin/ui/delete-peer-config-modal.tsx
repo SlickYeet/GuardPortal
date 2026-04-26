@@ -68,6 +68,7 @@ function DeletePeerConfigForm({
     onSuccess() {
       toast.success("Peer config deleted successfully")
       void utils.admin.peerConfigs.list.invalidate()
+      void utils.admin.wireguard.getAvailablePeerIPs.invalidate()
       form.reset()
       setOpen(false)
     },
