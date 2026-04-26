@@ -74,9 +74,7 @@ export function ConfigDetailsSection({
           {isAdmin && peerConfig && (
             <Button
               nativeButton={false}
-              render={
-                <Link href={`/admin/manage-peers&peerId=${peerConfig.id}`} />
-              }
+              render={<Link href={`/admin/configs?peerId=${peerConfig.id}`} />}
               size="icon"
               variant="secondary"
             >
