@@ -37,7 +37,6 @@ export const peerConfigTable = createTable(
   (t) => [index("peer_config_userId_idx").on(t.userId)],
 )
 
-export const peerConfigInsertSchema = createInsertSchema(peerConfigTable)
 export type PeerConfig = typeof peerConfigTable.$inferSelect
 
 export const user = createTable(
