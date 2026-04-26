@@ -8,6 +8,11 @@ export const peerConfigTable = createTable(
   "peer_config",
   (d) => ({
     allowedIPs: d.text("allowed_ips").notNull(),
+    configurationAddress: d.text("configuration_address").notNull(),
+    configurationListenPort: d.integer("configuration_listen_port").notNull(),
+    configurationName: d.text("configuration_name").notNull(),
+    configurationPrivateKey: d.text("configuration_private_key").notNull(),
+    configurationPublicKey: d.text("configuration_public_key").notNull(),
     dns: d.text("dns").notNull(),
     endpoint: d.text("endpoint").notNull(),
     endpointAllowedIP: d.text("endpoint_allowed_ip").notNull(),
@@ -26,6 +31,7 @@ export const peerConfigTable = createTable(
   (t) => [index("peer_config_userId_idx").on(t.userId)],
 )
 
+export const peerConfigInsertSchema = createInsertSchema(peerConfigTable)
 export type PeerConfig = typeof peerConfigTable.$inferSelect
 
 export const user = createTable(
