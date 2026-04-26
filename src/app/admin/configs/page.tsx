@@ -12,6 +12,10 @@ export default async function Page() {
 
   if (!session || !isAdmin) return notFound()
 
+  void api.admin.users.list.prefetchInfinite({
+    limit: DEFAULT_FETCH_LIMIT,
+  })
+  void api.admin.wireguard.getAvailablePeerIPs.prefetch()
   void api.admin.peerConfigs.list.prefetchInfinite({
     limit: DEFAULT_FETCH_LIMIT,
   })

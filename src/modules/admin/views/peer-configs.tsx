@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { CreatePeerConfigModal } from "@/modules/admin/ui/create-peer-config-modal"
 import { PeerConfigTable } from "@/modules/admin/ui/peer-config-table"
 
 export function PeerConfigsView() {
@@ -17,7 +18,7 @@ export function PeerConfigsView() {
             View and manage WireGuard peer configs.
           </CardDescription>
         </div>
-        {/* <CreatePeerConfigModal /> */}
+        <CreatePeerConfigModal />
       </CardHeader>
       <CardContent>
         <PeerConfigTable />
