@@ -64,7 +64,7 @@ function DeleteUserForm({ currentUserId, setOpen, user }: DeleteUserFormProps) {
 
   const form = useForm<z.infer<typeof deleteUserSchema>>({
     defaultValues: {
-      deleteConfig: false,
+      deleteConfig: true,
       id: user.id,
     },
     resolver: zodResolver(deleteUserSchema),
