@@ -23,7 +23,11 @@ import {
 export const adminRouter = createTRPCRouter({
   peerConfigs: createTRPCRouter({
     create: adminProcedure
-      .input(peerConfigInsertSchema)
+      .input(
+        peerConfigInsertSchema.omit({
+          id: true,
+        }),
+      )
       .mutation(async ({ ctx, input }) => {
         const [user] = await ctx.db
           .select()
@@ -158,6 +162,78 @@ export const adminRouter = createTRPCRouter({
           items,
           nextCursor,
         }
+      }),
+
+    update: adminProcedure
+      .input(peerConfigInsertSchema.partial())
+      .mutation(async ({ ctx, input }) => {
+        if (!input.id) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Peer config ID is required",
+          })
+        }
+
+        const [existingPeerConfig] = await ctx.db
+          .select()
+          .from(peerConfigTable)
+          .where(eq(peerConfigTable.id, input.id))
+
+        if (!existingPeerConfig) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `Peer config with ID ${input.id} not found`,
+          })
+        }
+
+        const wireguardPayload = {
+          allowed_ip: input.allowedIP ?? existingPeerConfig.allowedIP,
+          DNS: existingPeerConfig.dns,
+          endpoint_allowed_ip: existingPeerConfig.endpointAllowedIPs,
+          id: existingPeerConfig.id,
+          keepalive: existingPeerConfig.keepAlive,
+          mtu: existingPeerConfig.mtu,
+          name: input.name ?? existingPeerConfig.name,
+          preshared_key: existingPeerConfig.preSharedKey ?? "",
+          private_key: existingPeerConfig.privateKey,
+        }
+
+        const reqOpts: RequestInit = {
+          body: JSON.stringify(wireguardPayload),
+          headers: {
+            "Content-Type": "application/json",
+            "wg-dashboard-apikey": env.WIREGUARD_API_KEY,
+          },
+          method: "POST",
+          redirect: "follow",
+        }
+
+        const res = await fetch(
+          `${env.WIREGUARD_API_ENDPOINT}/updatePeerSettings/${env.WIREGUARD_CONFIG_NAME}`,
+          reqOpts,
+        )
+
+        if (!res.ok) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update peer config in WireGuard",
+          })
+        }
+
+        const [updatedPeerConfig] = await ctx.db
+          .update(peerConfigTable)
+          .set(input)
+          .where(eq(peerConfigTable.id, input.id))
+          .returning()
+
+        if (!updatedPeerConfig) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update peer config",
+          })
+        }
+
+        return updatedPeerConfig
       }),
   }),
 

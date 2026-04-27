@@ -27,6 +27,7 @@ export type WireguardConfig = z.infer<typeof wireguardConfig>
 
 export const peerConfigInsertSchema = z.object({
   allowedIP: z.string(),
+  id: z.string(),
   name: z.string().optional(),
   userId: z.string(),
 })

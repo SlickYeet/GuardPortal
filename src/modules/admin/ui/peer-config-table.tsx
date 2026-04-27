@@ -14,6 +14,7 @@ import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { parsePeerConfigName } from "@/helpers/parse-peer-config-name"
 import { api } from "@/lib/api/client"
 import { DeletePeerConfigModal } from "@/modules/admin/ui/delete-peer-config-modal"
+import { EditPeerConfigModal } from "@/modules/admin/ui/edit-peer-config-modal"
 
 export function PeerConfigTable() {
   const searchParams = useSearchParams()
@@ -55,7 +56,8 @@ export function PeerConfigTable() {
                 <TableCell className="text-right">
                   {new Date(peerConfig.createdAt).toDateString()}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="flex justify-end gap-x-2">
+                  <EditPeerConfigModal peerConfig={peerConfig} />
                   <DeletePeerConfigModal peerConfig={peerConfig} />
                 </TableCell>
               </TableRow>

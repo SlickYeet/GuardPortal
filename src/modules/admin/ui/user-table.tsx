@@ -63,7 +63,7 @@ export function UserTable({ currentUserId }: { currentUserId: string }) {
               <TableCell className="text-right">
                 {new Date(user.createdAt).toDateString()}
               </TableCell>
-              <TableCell className="flex justify-end space-x-2">
+              <TableCell className="flex justify-end gap-x-2">
                 {/* // TODO: consume peer config in EditUserModal */}
                 <EditUserModal currentUserId={currentUserId} user={user} />
                 <DeleteUserModal currentUserId={currentUserId} user={user} />

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FileCogIcon, PlusIcon } from "lucide-react"
+import { EditIcon, SaveIcon } from "lucide-react"
 import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -24,7 +24,6 @@ import {
 import {
   Field,
   FieldContent,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -39,13 +38,15 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { DEFAULT_FETCH_LIMIT } from "@/constants"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
 import { peerConfigInsertSchema } from "@/modules/admin/schema/config"
+import type { PeerConfig } from "@/server/db/schema"
 
-export function CreatePeerConfigModal() {
-  const isMobile = useIsMobile()
+interface EditPeerConfigModalProps {
+  peerConfig: PeerConfig
+}
 
+export function EditPeerConfigModal({ peerConfig }: EditPeerConfigModalProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
@@ -54,29 +55,22 @@ export function CreatePeerConfigModal() {
       onOpenChange={setIsOpen}
       open={isOpen}
       trigger={{
-        children: (
-          <>
-            <FileCogIcon /> {isMobile ? null : "Add Peer Config"}
-          </>
-        ),
-        size: isMobile ? "icon" : "default",
-        variant: "secondary",
+        children: <EditIcon />,
+        size: "icon",
+        variant: "outline",
       }}
     >
-      <CreatePeerConfigForm setOpen={setIsOpen} />
+      <EditPeerConfigForm peerConfig={peerConfig} setOpen={setIsOpen} />
     </ResponsiveModal>
   )
 }
 
-const formSchema = peerConfigInsertSchema.omit({
-  id: true,
-})
-
-interface CreatePeerConfigFormProps {
+interface EditPeerConfigFormProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  peerConfig: PeerConfig
 }
 
-function CreatePeerConfigForm({ setOpen }: CreatePeerConfigFormProps) {
+function EditPeerConfigForm({ setOpen, peerConfig }: EditPeerConfigFormProps) {
   const utils = api.useUtils()
 
   const [users] = api.admin.users.list.useSuspenseInfiniteQuery(
@@ -93,45 +87,46 @@ function CreatePeerConfigForm({ setOpen }: CreatePeerConfigFormProps) {
     }),
   )
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    defaultValues: {
-      allowedIP: firstAvailableIP,
-    },
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof peerConfigInsertSchema>>({
+    defaultValues: peerConfig,
+    resolver: zodResolver(peerConfigInsertSchema),
   })
 
-  const createPeerConfig = api.admin.peerConfigs.create.useMutation({
+  const updatePeerConfig = api.admin.peerConfigs.update.useMutation({
     onError(error) {
       toast.error("Something went wrong", {
         description: error.message,
       })
     },
     onSuccess() {
-      toast.success("Peer config created successfully")
+      toast.success("Peer config updated successfully")
       void utils.admin.peerConfigs.list.invalidate()
-      void utils.admin.wireguard.getAvailablePeerIPs.invalidate()
       form.reset()
       setOpen(false)
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    createPeerConfig.mutate(data)
+  function onSubmit(data: z.infer<typeof peerConfigInsertSchema>) {
+    updatePeerConfig.mutate(data)
   }
 
-  const isPending = form.formState.isSubmitting || createPeerConfig.isPending
+  const isPending = form.formState.isSubmitting || updatePeerConfig.isPending
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <Controller
           control={form.control}
+          name="id"
+          render={({ field }) => <input {...field} type="hidden" />}
+        />
+
+        <Controller
+          control={form.control}
           name="name"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>
-                Config Name (Optional)
-              </FieldLabel>
+              <FieldLabel htmlFor={field.name}>Config Name</FieldLabel>
               <Input
                 {...field}
                 aria-invalid={fieldState.invalid}
@@ -140,10 +135,6 @@ function CreatePeerConfigForm({ setOpen }: CreatePeerConfigFormProps) {
                 id={field.name}
                 placeholder="Enter config name"
               />
-              <FieldDescription>
-                A name to help you identify this peer config. If left empty, the
-                name will be generated from the users name.
-              </FieldDescription>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -271,8 +262,8 @@ function CreatePeerConfigForm({ setOpen }: CreatePeerConfigFormProps) {
             Cancel
           </Button>
           <Button disabled={isPending} type="submit">
-            {isPending ? <Spinner /> : <PlusIcon />}
-            Create Peer Config
+            {isPending ? <Spinner /> : <SaveIcon />}
+            Save changes
           </Button>
         </div>
       </FieldGroup>
