@@ -1,5 +1,7 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
+
 import {
   Table,
   TableBody,
@@ -14,8 +16,11 @@ import { api } from "@/lib/api/client"
 import { DeletePeerConfigModal } from "@/modules/admin/ui/delete-peer-config-modal"
 
 export function PeerConfigTable() {
+  const searchParams = useSearchParams()
+  const peerId = searchParams.get("peerId") ?? undefined
+
   const [peerConfigs] = api.admin.peerConfigs.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT },
+    { limit: DEFAULT_FETCH_LIMIT, peerId },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 

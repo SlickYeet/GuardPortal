@@ -112,6 +112,7 @@ export const adminRouter = createTRPCRouter({
             })
             .nullish(),
           limit: z.number().min(1).max(100).default(DEFAULT_FETCH_LIMIT),
+          peerId: z.string().nullish(),
         }),
       )
       .query(async ({ ctx, input }) => {
@@ -129,15 +130,18 @@ export const adminRouter = createTRPCRouter({
           .from(peerConfigTable)
           .leftJoin(userTable, eq(peerConfigTable.userId, userTable.id))
           .where(
-            cursor
-              ? or(
-                  lt(peerConfigTable.createdAt, cursor.createdAt),
-                  and(
-                    eq(peerConfigTable.createdAt, cursor.createdAt),
-                    lt(peerConfigTable.id, cursor.id),
-                  ),
-                )
-              : undefined,
+            and(
+              input.peerId ? eq(peerConfigTable.id, input.peerId) : undefined,
+              cursor
+                ? or(
+                    lt(peerConfigTable.createdAt, cursor.createdAt),
+                    and(
+                      eq(peerConfigTable.createdAt, cursor.createdAt),
+                      lt(peerConfigTable.id, cursor.id),
+                    ),
+                  )
+                : undefined,
+            ),
           )
           .orderBy(desc(peerConfigTable.createdAt), desc(peerConfigTable.id))
           .limit(limit + 1)
