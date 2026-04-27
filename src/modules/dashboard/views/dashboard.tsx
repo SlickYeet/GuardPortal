@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { DISCORD_URL } from "@/constants"
+import { env } from "@/env"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
@@ -62,8 +63,11 @@ export function DashboardView({ session }: { session: Session }) {
                     <AlertTitle>Peer Configuration Not Found</AlertTitle>
                     <AlertDescription>
                       We couldn&apos;t find the WireGuard configuration for your
-                      account. Please contact support if you believe this is an
-                      error.
+                      account. Please contact{" "}
+                      <Link href={`mailto:${env.NEXT_PUBLIC_CONTACT_EMAIL}`}>
+                        {env.NEXT_PUBLIC_CONTACT_EMAIL}
+                      </Link>{" "}
+                      if you believe this is an error.
                     </AlertDescription>
                     <AlertAction>
                       <Button
