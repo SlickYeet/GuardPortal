@@ -21,6 +21,7 @@ import { ConfigDetailsSection } from "@/modules/dashboard/sections/config-detail
 import { DashboardHeaderSection } from "@/modules/dashboard/sections/dashboard-header"
 import { QRCodeSection } from "@/modules/dashboard/sections/qr-code-sections"
 import { SetupInstructionsSection } from "@/modules/dashboard/sections/setup-instructions"
+import { QRCodeModal } from "@/modules/dashboard/ui/qr-code-modal"
 
 export function DashboardView({ session }: { session: Session }) {
   const isMobile = useIsMobile()
@@ -41,7 +42,12 @@ export function DashboardView({ session }: { session: Session }) {
               !peerConfig && "pointer-events-none blur-sm",
             )}
           >
-            <QRCodeSection peerConfig={peerConfig} />
+            <div className="hidden md:block">
+              <QRCodeSection peerConfig={peerConfig} />
+            </div>
+            <div className="block md:hidden">
+              <QRCodeModal peerConfig={peerConfig} />
+            </div>
             <ConfigDetailsSection isAdmin={isAdmin} peerConfig={peerConfig} />
           </div>
           {!peerConfig && (
@@ -50,13 +56,7 @@ export function DashboardView({ session }: { session: Session }) {
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-lg bg-black/10"
               />
-              <div
-                className={cn(
-                  "absolute left-1/2 w-full max-w-2xl -translate-x-1/2",
-                  "md:top-1/2 md:-translate-y-1/2",
-                  "top-1/5 -translate-y-1/5",
-                )}
-              >
+              <div className="absolute top-1/2 left-1/2 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2">
                 <div className="rounded-2xl bg-card">
                   <Alert variant="destructive">
                     <AlertTriangleIcon />
