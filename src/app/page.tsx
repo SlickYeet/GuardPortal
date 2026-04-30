@@ -13,29 +13,25 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!session) {
     return {
       description: "Please log in to view your VPN configuration.",
-      title: APP_NAME,
+      title: "Please log in to view your VPN configuration.",
     }
   }
 
-  const user = session.user
-  const userName =
-    user.name.charAt(0).toUpperCase() + user.name.slice(1) || user.email
-
   const config = await api.wireguard.getPeerConfigByUserId({
-    userId: user.id,
+    userId: session.user.id,
   })
 
   if (!config) {
     return {
       description: "You have no VPN configuration set up yet.",
-      title: `${userName} - ${APP_NAME}`,
+      title: "You have no VPN configuration set up yet.",
     }
   }
 
   const configName = parsePeerConfigName(config.name)
 
   return {
-    title: `${configName} - ${userName}`,
+    title: `${configName} - ${APP_NAME}`,
   }
 }
 
