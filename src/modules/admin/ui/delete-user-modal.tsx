@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
+import { APP_NAME } from "@/constants"
 import { api } from "@/lib/api/client"
 import type { User } from "@/lib/auth/utils"
 import { deleteUserSchema } from "@/modules/admin/schema/user"
@@ -101,7 +102,7 @@ function DeleteUserForm({ currentUserId, setOpen, user }: DeleteUserFormProps) {
       <Alert className="max-md:mb-4" variant="warning">
         <AlertTriangleIcon />
         <AlertTitle>
-          Deleting users through GuardPortal is not recommended
+          Deleting users through {APP_NAME} is not recommended
         </AlertTitle>
         <AlertDescription>
           Instead, use your identity provider's user management system to delete

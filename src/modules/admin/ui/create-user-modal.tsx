@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
+import { APP_NAME } from "@/constants"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { api } from "@/lib/api/client"
 import { userInsertSchema } from "@/server/db/schema"
@@ -107,7 +108,7 @@ function CreateUserForm({ setOpen }: CreateUserFormProps) {
       <Alert className="max-md:mb-4" variant="warning">
         <AlertTriangleIcon />
         <AlertTitle>
-          Creating users through GuardPortal is not recommended.
+          Creating users through {APP_NAME} is not recommended.
         </AlertTitle>
         <AlertDescription>
           Instead, use your identity provider's user management system to create
