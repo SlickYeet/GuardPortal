@@ -4,8 +4,9 @@ import { LoginForm } from "@/modules/auth/ui/login-form"
 
 export function LoginView({ appName }: { appName: string }) {
   return (
-    <div className="-mt-12 flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-lg space-y-8">
+    <div className="relative flex min-h-screen items-center justify-center px-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(217,88,56,0.12),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(217,88,56,0.08),transparent_28%)]" />
+      <div className="-mt-40 w-full max-w-lg space-y-8">
         <div className="text-center">
           <span className="text-muted-foreground text-xs tracking-wide">
             Powered by{" "}

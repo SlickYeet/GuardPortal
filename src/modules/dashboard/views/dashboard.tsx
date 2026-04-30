@@ -33,7 +33,8 @@ export function DashboardView({ session }: { session: Session }) {
   })
 
   return (
-    <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(217,88,56,0.12),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(217,88,56,0.08),transparent_28%)]" />
       <div className="mx-auto max-w-3xl">
         <DashboardHeaderSection isAdmin={isAdmin} session={session} />
         <div className="relative">
