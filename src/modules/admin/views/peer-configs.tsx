@@ -65,7 +65,7 @@ function ClearPeerIdButton() {
       size={isMobile ? "sm" : "default"}
       variant={isMobile ? "secondary" : "ghost"}
     >
-      <XIcon /> Clear Peer ID
+      <XIcon /> Clear Filter
     </Button>
   )
 }
