@@ -1,4 +1,5 @@
 import { ArrowLeftIcon } from "lucide-react"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -8,6 +9,11 @@ import { APP_NAME } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { getSession } from "@/lib/auth/utils"
 import { AdminTabs } from "@/modules/admin/ui/admin-tabs"
+
+export const metadata: Metadata = {
+  description: `${APP_NAME} Admin Dashboard`,
+  title: `${APP_NAME} Admin`,
+}
 
 export default async function Layout({ children }: LayoutProps<"/">) {
   const session = await getSession()
