@@ -16,7 +16,7 @@ export function SiteBanner({
   if (!announcementEnabled && !maintenanceMode) return null
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 pt-3">
       <div className="mx-auto max-w-5xl">
         <Alert variant={maintenanceMode ? "warning" : "info"}>
           {maintenanceMode ? <BadgeAlertIcon /> : <AlertCircleIcon />}
