@@ -24,7 +24,13 @@ export function QRCodeModal({ peerConfig }: QRCodeModalProps) {
   return (
     <Dialog>
       <DialogTrigger
-        render={<Button className="w-full" size="lg" variant="secondary" />}
+        render={
+          <Button
+            className="inline-flex w-full md:hidden"
+            size="lg"
+            variant="secondary"
+          />
+        }
       >
         <QrCodeIcon /> View QR Code
       </DialogTrigger>

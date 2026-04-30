@@ -20,7 +20,7 @@ interface QRCodeSectionProps {
 
 export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
   return (
-    <Card>
+    <Card className="hidden md:flex">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <QrCodeIcon className="inline-block size-5" />

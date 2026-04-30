@@ -42,12 +42,8 @@ export function DashboardView({ session }: { session: Session }) {
               !peerConfig && "pointer-events-none blur-sm",
             )}
           >
-            <div className="hidden md:block">
-              <QRCodeSection peerConfig={peerConfig} />
-            </div>
-            <div className="block md:hidden">
-              <QRCodeModal peerConfig={peerConfig} />
-            </div>
+            <QRCodeSection peerConfig={peerConfig} />
+            <QRCodeModal peerConfig={peerConfig} />
             <ConfigDetailsSection isAdmin={isAdmin} peerConfig={peerConfig} />
           </div>
           {!peerConfig && (
