@@ -8,7 +8,7 @@
 
 **GuardPortal** is a self-hosted, open-source VPN client portal built with
 **Next.js** and powered by the **WireGuard Dashboard API**.  
-It offers secure, access to WireGuard peer configs via [authentik](https://goauthentik.io/) — perfect for small teams, personal projects, or home labs.
+It offers secure, access to WireGuard peer configs via [authentik](https://goauthentik.io/) - perfect for small teams, personal projects, or home labs.
 
 - No public sign-ups.
 - Centralized and controlled access.
