@@ -105,7 +105,7 @@ function DeletePeerConfigForm({
       </Alert>
 
       <form
-        className="flex items-center justify-end gap-2"
+        className="mt-4 flex items-center justify-end gap-2"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <Button
