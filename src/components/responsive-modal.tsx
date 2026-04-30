@@ -27,6 +27,7 @@ interface ResponsiveModalProps {
   children: React.ReactNode
   className?: string
   alert?: boolean
+  modal?: boolean
 }
 
 const defaultTrigger: React.ComponentProps<typeof Button> = {
@@ -48,6 +49,7 @@ export function ResponsiveModal({
   children,
   className,
   alert = false,
+  modal = true,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery(mediaQuery)
   const resolvedTrigger = isTriggerElement(trigger)
@@ -91,7 +93,12 @@ export function ResponsiveModal({
   }
 
   return (
-    <Drawer dismissible={!alert} onOpenChange={onOpenChange} open={open}>
+    <Drawer
+      dismissible={!alert}
+      modal={modal}
+      onOpenChange={onOpenChange}
+      open={open}
+    >
       <DrawerTrigger asChild>{resolvedTrigger.element}</DrawerTrigger>
       <DrawerContent className={cn("min-h-[50svh]", className)}>
         <DrawerHeader hidden>

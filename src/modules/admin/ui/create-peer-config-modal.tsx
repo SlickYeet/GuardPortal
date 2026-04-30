@@ -51,6 +51,7 @@ export function CreatePeerConfigModal() {
   return (
     <ResponsiveModal
       className="max-md:min-h-full"
+      modal={false}
       onOpenChange={setIsOpen}
       open={isOpen}
       trigger={{

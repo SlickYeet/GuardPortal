@@ -40,6 +40,7 @@ export function CreateUserModal() {
   return (
     <ResponsiveModal
       className="max-md:min-h-full"
+      modal={false}
       onOpenChange={setIsOpen}
       open={isOpen}
       trigger={{
