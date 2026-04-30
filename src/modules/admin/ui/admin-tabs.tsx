@@ -1,6 +1,6 @@
 "use client"
 
-import { FileCogIcon, UsersIcon } from "lucide-react"
+import { FileCogIcon, SettingsIcon, UsersIcon } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import * as React from "react"
 
@@ -19,6 +19,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 const TABS = [
   { icon: UsersIcon, label: "Users", value: "users" },
   { icon: FileCogIcon, label: "Peer Configs", value: "configs" },
+  { icon: SettingsIcon, label: "Site Settings", value: "settings" },
 ] as const
 type Tab = (typeof TABS)[number]
 

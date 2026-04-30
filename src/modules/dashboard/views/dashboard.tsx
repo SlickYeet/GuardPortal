@@ -10,7 +10,6 @@ import {
   AlertTitle,
 } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { DISCORD_URL } from "@/constants"
 import { env } from "@/env"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -27,6 +26,8 @@ export function DashboardView({ session }: { session: Session }) {
   const isMobile = useIsMobile()
   const isAdmin = isUserAdmin(session)
 
+  const [siteSettings] = api.siteSettings.get.useSuspenseQuery()
+
   const [peerConfig] = api.wireguard.getPeerConfigByUserId.useSuspenseQuery({
     userId: session.user.id,
   })
@@ -42,8 +43,14 @@ export function DashboardView({ session }: { session: Session }) {
               !peerConfig && "pointer-events-none blur-sm",
             )}
           >
-            <QRCodeSection peerConfig={peerConfig} />
-            <QRCodeModal peerConfig={peerConfig} />
+            <QRCodeSection
+              fallbackQrUrl={siteSettings.fallbackQrUrl}
+              peerConfig={peerConfig}
+            />
+            <QRCodeModal
+              fallbackQrUrl={siteSettings.fallbackQrUrl}
+              peerConfig={peerConfig}
+            />
             <ConfigDetailsSection isAdmin={isAdmin} peerConfig={peerConfig} />
           </div>
           {!peerConfig && (
@@ -70,7 +77,11 @@ export function DashboardView({ session }: { session: Session }) {
                         nativeButton={false}
                         render={
                           <Link
-                            href={isAdmin ? "/admin/configs" : DISCORD_URL}
+                            href={
+                              isAdmin
+                                ? "/admin/configs"
+                                : siteSettings.discordUrl
+                            }
                           />
                         }
                         size={isMobile ? "icon" : "sm"}

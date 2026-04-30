@@ -10,15 +10,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { FALLBACK_QR_URL } from "@/constants"
 import { QRCodeDisplay } from "@/modules/dashboard/ui/qr-code-display"
 import type { PeerConfig } from "@/server/db/schema"
 
 interface QRCodeSectionProps {
+  fallbackQrUrl: string
   peerConfig: PeerConfig | null
 }
 
-export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
+export function QRCodeSection({
+  fallbackQrUrl,
+  peerConfig,
+}: QRCodeSectionProps) {
   return (
     <Card className="hidden md:flex">
       <CardHeader>
@@ -39,7 +42,7 @@ export function QRCodeSection({ peerConfig }: QRCodeSectionProps) {
               bgColor="#18181b"
               className="rounded-lg border"
               fgColor="#fafafa"
-              value={FALLBACK_QR_URL}
+              value={fallbackQrUrl}
             />
           </div>
         )}

@@ -2,7 +2,40 @@ import { relations } from "drizzle-orm"
 import { index, pgTableCreator } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-zod"
 
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  DEFAULT_FETCH_LIMIT,
+  DISCORD_URL,
+  FALLBACK_QR_URL,
+} from "@/constants"
+
 export const createTable = pgTableCreator((name) => `guardportal_${name}`)
+
+export const siteSettingsTable = createTable("site_settings", (d) => ({
+  announcementEnabled: d
+    .boolean("announcement_enabled")
+    .notNull()
+    .default(false),
+  announcementMessage: d.text("announcement_message").notNull().default(""),
+  appDescription: d.text("app_description").notNull().default(APP_DESCRIPTION),
+  appName: d.text("app_name").notNull().default(APP_NAME),
+  defaultFetchLimit: d
+    .integer("default_fetch_limit")
+    .notNull()
+    .default(DEFAULT_FETCH_LIMIT),
+  discordUrl: d.text("discord_url").notNull().default(DISCORD_URL),
+  fallbackQrUrl: d.text("fallback_qr_url").notNull().default(FALLBACK_QR_URL),
+  id: d.text("id").primaryKey(),
+  maintenanceMode: d.boolean("maintenance_mode").notNull().default(false),
+  updatedAt: d
+    .timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+}))
+
+export type SiteSettings = typeof siteSettingsTable.$inferSelect
 
 export const peerConfigTable = createTable(
   "peer_config",

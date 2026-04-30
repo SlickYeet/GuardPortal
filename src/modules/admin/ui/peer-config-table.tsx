@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { parsePeerConfigName } from "@/helpers/parse-peer-config-name"
 import { api } from "@/lib/api/client"
 import { DeletePeerConfigModal } from "@/modules/admin/ui/delete-peer-config-modal"
@@ -20,8 +19,9 @@ export function PeerConfigTable() {
   const searchParams = useSearchParams()
   const peerId = searchParams.get("peerId") ?? undefined
 
+  const [siteSettings] = api.siteSettings.get.useSuspenseQuery()
   const [peerConfigs] = api.admin.peerConfigs.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT, peerId },
+    { limit: siteSettings.defaultFetchLimit, peerId },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 

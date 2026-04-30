@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
+import { SiteBanner } from "@/components/site-banner"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { APP_DESCRIPTION, APP_NAME } from "@/constants"
 import { TRPCReactProvider } from "@/lib/api/client"
+import { getSiteSettings } from "@/lib/site-settings"
 import { cn } from "@/lib/utils"
 
 import "@/styles/globals.css"
@@ -20,21 +21,30 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 })
 
-export const metadata: Metadata = {
-  description: APP_DESCRIPTION,
-  title: APP_NAME,
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = await getSiteSettings()
+
+  return {
+    description: siteSettings.appDescription,
+    title: siteSettings.appName,
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const siteSettings = await getSiteSettings()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta content={APP_NAME} name="apple-mobile-web-app-title" />
-        <meta content={APP_DESCRIPTION} name="description" />
+        <meta
+          content={siteSettings.appName}
+          name="apple-mobile-web-app-title"
+        />
+        <meta content={siteSettings.appDescription} name="description" />
       </head>
       <body
         className={cn(
@@ -45,8 +55,15 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <ThemeProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-            <Toaster closeButton richColors />
+            <TooltipProvider>
+              <SiteBanner
+                announcementEnabled={siteSettings.announcementEnabled}
+                announcementMessage={siteSettings.announcementMessage}
+                maintenanceMode={siteSettings.maintenanceMode}
+              />
+              {children}
+              <Toaster closeButton richColors />
+            </TooltipProvider>
           </ThemeProvider>
         </TRPCReactProvider>
       </body>

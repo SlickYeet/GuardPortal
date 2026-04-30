@@ -37,7 +37,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Spinner } from "@/components/ui/spinner"
-import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { peerConfigInsertSchema } from "@/modules/admin/schema/config"
 import type { PeerConfig } from "@/server/db/schema"
@@ -73,8 +72,9 @@ interface EditPeerConfigFormProps {
 function EditPeerConfigForm({ setOpen, peerConfig }: EditPeerConfigFormProps) {
   const utils = api.useUtils()
 
+  const [siteSettings] = api.siteSettings.get.useSuspenseQuery()
   const [users] = api.admin.users.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT },
+    { limit: siteSettings.defaultFetchLimit },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
   const [availableIPs] =

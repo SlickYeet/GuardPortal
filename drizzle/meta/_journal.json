@@ -50,6 +50,13 @@
       "when": 1777239773688,
       "tag": "0006_fantastic_quicksilver",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1777517700904,
+      "tag": "0007_strong_bucky",
+      "breakpoints": true
     }
   ]
 }

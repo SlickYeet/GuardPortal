@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
-import { APP_NAME } from "@/constants"
 import { api } from "@/lib/api/client"
 import type { User } from "@/lib/auth/utils"
 import { deleteUserSchema } from "@/modules/admin/schema/user"
@@ -64,6 +63,8 @@ interface DeleteUserFormProps {
 function DeleteUserForm({ currentUserId, setOpen, user }: DeleteUserFormProps) {
   const utils = api.useUtils()
 
+  const [siteSettings] = api.siteSettings.get.useSuspenseQuery()
+
   const form = useForm<z.infer<typeof deleteUserSchema>>({
     defaultValues: {
       deleteConfig: true,
@@ -102,7 +103,7 @@ function DeleteUserForm({ currentUserId, setOpen, user }: DeleteUserFormProps) {
       <Alert className="max-md:mb-4" variant="warning">
         <AlertTriangleIcon />
         <AlertTitle>
-          Deleting users through {APP_NAME} is not recommended
+          Deleting users through {siteSettings.appName} is not recommended
         </AlertTitle>
         <AlertDescription>
           Instead, use your identity provider's user management system to delete

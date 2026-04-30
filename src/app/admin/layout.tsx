@@ -5,19 +5,24 @@ import { notFound } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { UserMenu } from "@/components/user-menu"
-import { APP_NAME } from "@/constants"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { getSession } from "@/lib/auth/utils"
+import { getSiteSettings } from "@/lib/site-settings"
 import { AdminTabs } from "@/modules/admin/ui/admin-tabs"
 
-export const metadata: Metadata = {
-  description: `${APP_NAME} Admin Dashboard`,
-  title: `${APP_NAME} Admin`,
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = await getSiteSettings()
+
+  return {
+    description: `${siteSettings.appName} Admin Dashboard`,
+    title: `${siteSettings.appName} Admin`,
+  }
 }
 
 export default async function Layout({ children }: LayoutProps<"/">) {
   const session = await getSession()
   const isAdmin = isUserAdmin(session)
+  const siteSettings = await getSiteSettings()
 
   if (!session || !isAdmin) return notFound()
 
@@ -35,7 +40,8 @@ export default async function Layout({ children }: LayoutProps<"/">) {
               <ArrowLeftIcon className="size-6" />
             </Button>
             <h1 className="font-bold text-3xl">
-              <span className="@md:inline hidden">{APP_NAME}</span> Admin
+              <span className="@md:inline hidden">{siteSettings.appName}</span>{" "}
+              Admin
             </h1>
           </div>
           <UserMenu isAdmin={isAdmin} user={session.user} />

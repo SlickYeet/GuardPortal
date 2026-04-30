@@ -3,24 +3,19 @@ import { notFound } from "next/navigation"
 import { isUserAdmin } from "@/helpers/is-user-admin"
 import { api, HydrateClient } from "@/lib/api/server"
 import { getSession } from "@/lib/auth/utils"
-import { getSiteSettings } from "@/lib/site-settings"
-import { UsersView } from "@/modules/admin/views/users"
+import { SiteSettingsView } from "@/modules/admin/views/site-settings"
 
 export default async function Page() {
   const session = await getSession()
   const isAdmin = isUserAdmin(session)
-  const siteSettings = await getSiteSettings()
 
   if (!session || !isAdmin) return notFound()
 
   void api.siteSettings.get.prefetch()
-  void api.admin.users.list.prefetchInfinite({
-    limit: siteSettings.defaultFetchLimit,
-  })
 
   return (
     <HydrateClient>
-      <UsersView currentUserId={session.user.id} />
+      <SiteSettingsView />
     </HydrateClient>
   )
 }

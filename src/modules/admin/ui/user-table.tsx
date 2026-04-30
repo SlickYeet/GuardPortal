@@ -10,14 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { DEFAULT_FETCH_LIMIT } from "@/constants"
 import { api } from "@/lib/api/client"
 import { DeleteUserModal } from "@/modules/admin/ui/delete-user-modal"
 import { EditUserModal } from "@/modules/admin/ui/edit-user-modal"
 
 export function UserTable({ currentUserId }: { currentUserId: string }) {
+  const [siteSettings] = api.siteSettings.get.useSuspenseQuery()
   const [users] = api.admin.users.list.useSuspenseInfiniteQuery(
-    { limit: DEFAULT_FETCH_LIMIT },
+    { limit: siteSettings.defaultFetchLimit },
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   )
 

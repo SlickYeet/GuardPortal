@@ -1,9 +1,8 @@
 import Image from "next/image"
 
-import { APP_NAME } from "@/constants"
 import { LoginForm } from "@/modules/auth/ui/login-form"
 
-export function LoginView() {
+export function LoginView({ appName }: { appName: string }) {
   return (
     <div className="-mt-12 flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-lg space-y-8">
@@ -27,7 +26,7 @@ export function LoginView() {
             </div>
           </a>
           <h1 className="my-6 text-center font-bold text-3xl md:text-4xl">
-            Sign in to {APP_NAME}
+            Sign in to {appName}
           </h1>
         </div>
         <LoginForm />

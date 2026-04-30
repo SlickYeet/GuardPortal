@@ -4,6 +4,7 @@ import { z } from "zod"
 export const env = createEnv({
   client: {
     NEXT_PUBLIC_CONTACT_EMAIL: z.email(),
+    NEXT_PUBLIC_DISCORD_URL: z.url(),
     NEXT_PUBLIC_URL: z.url(),
   },
   emptyStringAsUndefined: true,
@@ -13,6 +14,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+    NEXT_PUBLIC_DISCORD_URL: process.env.NEXT_PUBLIC_DISCORD_URL,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NODE_ENV: process.env.NODE_ENV,
     REDIS_URL: process.env.REDIS_URL,

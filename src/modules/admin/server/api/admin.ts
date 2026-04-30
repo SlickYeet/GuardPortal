@@ -3,7 +3,11 @@ import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm"
 import { headers } from "next/headers"
 import * as z from "zod"
 
-import { DEFAULT_FETCH_LIMIT } from "@/constants"
+import {
+  DEFAULT_FETCH_LIMIT,
+  DEFAULT_SITE_SETTINGS,
+  SITE_SETTINGS_ID,
+} from "@/constants"
 import { env } from "@/env"
 import { formatPeerConfigName } from "@/helpers/format-peer-config-name"
 import { generatePeerConfig } from "@/helpers/generate-peer-config"
@@ -11,11 +15,13 @@ import {
   deletePeerConfigSchema,
   peerConfigInsertSchema,
 } from "@/modules/admin/schema/config"
+import { siteSettingsUpdateSchema } from "@/modules/admin/schema/site-settings"
 import { deleteUserSchema } from "@/modules/admin/schema/user"
 import { adminProcedure, createTRPCRouter } from "@/server/api/init"
 import { auth } from "@/server/auth"
 import {
   peerConfigTable,
+  siteSettingsTable,
   userInsertSchema,
   user as userTable,
 } from "@/server/db/schema"
@@ -234,6 +240,48 @@ export const adminRouter = createTRPCRouter({
         }
 
         return updatedPeerConfig
+      }),
+  }),
+
+  siteSettings: createTRPCRouter({
+    update: adminProcedure
+      .input(siteSettingsUpdateSchema)
+      .mutation(async ({ ctx, input }) => {
+        const [settings] = await ctx.db
+          .insert(siteSettingsTable)
+          .values({
+            announcementEnabled: input.announcementEnabled,
+            announcementMessage: input.announcementMessage,
+            appDescription: input.appDescription,
+            appName: input.appName,
+            defaultFetchLimit: input.defaultFetchLimit,
+            discordUrl: input.discordUrl,
+            fallbackQrUrl: input.fallbackQrUrl,
+            id: SITE_SETTINGS_ID,
+            maintenanceMode: input.maintenanceMode,
+          })
+          .onConflictDoUpdate({
+            set: {
+              announcementEnabled: input.announcementEnabled,
+              announcementMessage: input.announcementMessage,
+              appDescription: input.appDescription,
+              appName: input.appName,
+              defaultFetchLimit: input.defaultFetchLimit,
+              discordUrl: input.discordUrl,
+              fallbackQrUrl: input.fallbackQrUrl,
+              maintenanceMode: input.maintenanceMode,
+            },
+            target: siteSettingsTable.id,
+          })
+          .returning()
+
+        return (
+          settings ?? {
+            ...DEFAULT_SITE_SETTINGS,
+            id: SITE_SETTINGS_ID,
+            updatedAt: new Date(0),
+          }
+        )
       }),
   }),
 
