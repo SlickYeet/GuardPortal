@@ -1,1 +1,0 @@
-ALTER TABLE "guardportal_peer_config" ALTER COLUMN "pre_shared_key" DROP NOT NULL;

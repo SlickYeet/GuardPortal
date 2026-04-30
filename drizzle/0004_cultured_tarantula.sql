@@ -1,1 +1,0 @@
-ALTER TABLE "guardportal_peer_config" RENAME COLUMN "allowed_ips" TO "allowed_ip";

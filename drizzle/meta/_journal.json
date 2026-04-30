@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1776836546798,
-      "tag": "0000_closed_the_fury",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1776994647757,
-      "tag": "0001_brainy_sunspot",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1777013269613,
-      "tag": "0002_workable_chimera",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1777166697482,
-      "tag": "0003_melted_dreadnoughts",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1777185469789,
-      "tag": "0004_cultured_tarantula",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1777185872699,
-      "tag": "0005_woozy_white_queen",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1777239773688,
-      "tag": "0006_fantastic_quicksilver",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1777517700904,
-      "tag": "0007_strong_bucky",
+      "when": 1777534345235,
+      "tag": "0000_colorful_wild_pack",
       "breakpoints": true
     }
   ]
