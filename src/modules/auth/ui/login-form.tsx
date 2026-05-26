@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
+import { env } from "@/env"
 import { authClient } from "@/lib/auth/client"
 
 export function LoginForm() {
@@ -26,7 +27,7 @@ export function LoginForm() {
             setIsLoading(false)
           },
         },
-        providerId: "authentik",
+        providerId: env.NEXT_PUBLIC_OAUTH_PROVIDER_ID,
       })
     } catch (error) {
       console.error(error)

@@ -49,12 +49,11 @@ export const auth = betterAuth({
     genericOAuth({
       config: [
         {
-          clientId: env.AUTHENTIK_CLIENT_ID,
-          clientSecret: env.AUTHENTIK_CLIENT_SECRET,
-          discoveryUrl:
-            "https://auth.famlam.ca/application/o/wire-guard/.well-known/openid-configuration",
+          clientId: env.OAUTH_CLIENT_ID,
+          clientSecret: env.OAUTH_CLIENT_SECRET,
+          discoveryUrl: env.OAUTH_DISCOVERY_URL,
           pkce: true,
-          providerId: "authentik",
+          providerId: env.NEXT_PUBLIC_OAUTH_PROVIDER_ID,
           scopes: ["openid", "email", "profile"],
         },
       ],
