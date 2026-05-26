@@ -8,6 +8,13 @@
       "when": 1777534345235,
       "tag": "0000_colorful_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779772404594,
+      "tag": "0001_breezy_mikhail_rasputin",
+      "breakpoints": true
     }
   ]
 }

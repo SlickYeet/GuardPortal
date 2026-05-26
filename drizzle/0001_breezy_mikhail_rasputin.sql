@@ -1,0 +1,1 @@
+ALTER TABLE "guardportal_user" ALTER COLUMN "email_verified" SET DEFAULT true;

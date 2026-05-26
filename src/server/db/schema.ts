@@ -80,7 +80,7 @@ export const user = createTable(
     banReason: d.text("ban_reason"),
     createdAt: d.timestamp("created_at").defaultNow().notNull(),
     email: d.text("email").notNull().unique(),
-    emailVerified: d.boolean("email_verified").default(false).notNull(),
+    emailVerified: d.boolean("email_verified").default(true).notNull(),
     id: d.text("id").primaryKey(),
     image: d.text("image").default("https://gravatar.com/avatar/HASH"),
     name: d.text("name").notNull(),
